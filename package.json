@@ -1,0 +1,25 @@
+{
+  "name": "factorial-hr-challenge",
+  "version": "1.0.0",
+  "description": "Technical challenge provided by Factorial HR engineering team",
+  "main": "main.ts",
+  "scripts": {
+    "test": "jest --i",
+    "tdd": "jest --watchAll",
+    "build": "tsc"
+  },
+  "keywords": [
+    "challenge",
+    "factorial",
+    "typescript"
+  ],
+  "author": "Juan Bigorra",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^4.0.0-beta1",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
+  }
+}
