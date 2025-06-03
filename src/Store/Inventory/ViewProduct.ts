@@ -1,31 +1,27 @@
+import { IInventory } from "../../../specs/Store/Inventory/Interfaces"
+import { Product } from "../../db"
+
 export class ViewProductCommand {
     constructor(
-        private readonly productId: number
+        readonly productId: number
     ) {}
 }
 
 export type ViewProductResult = {
-    product: Product
+    product?: Product,
+    error?: Error
 }
 
 export class ViewProduct {
-    constructor() {
-        
-    }
+    constructor(private readonly inventory: IInventory) {}
 
     public execute(command: ViewProductCommand): ViewProductResult {
-        return {
-            product: {
-                id: 1,
-                name: "Product 1",
-                description: "Product 1 description",
-                images: ["image.jpg"],
-                basePrice: 100,
-                stock: 10,
-                selectedParts: [],
-                options: [],
-                type: "standard",
-            }
-        }
+      const product = this.inventory.products.findById(command.productId)
+
+      if (!product) return { product, error: new Error("Product not found") }
+
+      return {
+        product
+      }
     }
 }
