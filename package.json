@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "test": "jest --i",
-    "tdd": "jest --watchAll",
+    "tdd": "bun test --watch",
     "build": "tsc"
   },
   "keywords": [
