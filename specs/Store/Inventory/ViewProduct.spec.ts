@@ -1,10 +1,10 @@
 import {
   ViewProduct,
   ViewProductCommand,
-} from "../../../src/Store/Inventory/ViewProduct";
-import { InMemoryInventory } from "../../../src/Store/Inventory/InMemoryInventory";
-import { ProductRepository } from "../../../src/Store/Inventory/InMemoryInventory";
-import { Product } from "../../../src/db";
+} from "../../../src/Store/Inventory/Actions/ViewProduct";
+import { InMemoryInventory } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import { ProductRepository } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import { Product } from "../../../src/Store/Inventory/Core/Entities";
 import { productsFixture } from "../../Fixtures/Inventory";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 

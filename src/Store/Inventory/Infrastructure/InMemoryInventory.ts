@@ -1,6 +1,6 @@
-import { IInventory } from "../../../specs/Store/Inventory/Interfaces";
-import { IProductRepository } from "../../../specs/Store/Inventory/Interfaces";
-import { Inventory, Product } from "../../db";
+import { IInventory } from "../Interfaces";
+import { IProductRepository } from "../Interfaces";
+import { Inventory, Product } from "../Core/Entities";
 
 export class InMemoryInventory implements IInventory {
   constructor(readonly products: IProductRepository) {}

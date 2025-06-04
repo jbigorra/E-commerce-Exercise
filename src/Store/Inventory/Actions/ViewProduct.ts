@@ -1,5 +1,5 @@
-import { IInventory } from "../../../specs/Store/Inventory/Interfaces"
-import { Product } from "../../db"
+import { IInventory } from "../Interfaces"
+import { Product } from "../Core/Entities"
 
 export class ViewProductCommand {
     constructor(

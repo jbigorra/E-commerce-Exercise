@@ -1,4 +1,4 @@
-import { Product } from "../../src/db";
+import { Product } from "../../src/Store/Inventory/Core/Entities";
 
 export const productsFixture = (): Product[] => {
   const products: Product[] = [
