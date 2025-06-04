@@ -7,21 +7,21 @@ export class ViewProductCommand {
     ) {}
 }
 
-export type ViewProductResult = {
-    product?: Product,
-    error?: Error
-}
+export type ActionResult<TResult> =
+  | { result: TResult, error: undefined }
+  | { result: undefined, error: Error }
 
 export class ViewProduct {
     constructor(private readonly inventory: IInventory) {}
 
-    public execute(command: ViewProductCommand): ViewProductResult {
+    public execute(command: ViewProductCommand): ActionResult<Product> {
       const product = this.inventory.products.findById(command.productId)
 
-      if (!product) return { product, error: new Error("Product not found") }
+      if (!product) return { result: undefined, error: new Error("Product not found") }
 
       return {
-        product
+        result: product,
+        error: undefined
       }
     }
 }

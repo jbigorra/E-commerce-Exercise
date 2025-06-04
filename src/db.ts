@@ -5,7 +5,8 @@ type Prettify<T> = {
 export type Product = Prettify<
   {
     id: number;
-    options: ProductOption[];
+    basePrice: number;
+    availableOptions: ProductOption[];
   } & (StandardProduct | CustomizableProduct)
 >;
 
@@ -33,4 +34,5 @@ export type Inventory = {
 
 export type ProductOption = {
   id: number;
+  price: number;
 };
