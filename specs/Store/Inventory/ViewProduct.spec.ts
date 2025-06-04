@@ -1,47 +1,12 @@
 import {
   ViewProduct,
   ViewProductCommand,
-  ActionResult,
 } from "../../../src/Store/Inventory/ViewProduct";
 import { InMemoryInventory } from "../../../src/Store/Inventory/InMemoryInventory";
 import { ProductRepository } from "../../../src/Store/Inventory/InMemoryInventory";
-import { CustomizableProduct, Product, StandardProduct } from "../../../src/db";
+import { Product } from "../../../src/db";
 import { productsFixture } from "../../Fixtures/Inventory";
-
-type Matcher<T = unknown> = T | ((actual: T) => void);
-
-export function expectSuccess<TResult>(
-  obj: ActionResult<TResult>,
-  expectedProps?: Record<string, Matcher>
-): asserts obj is { result: TResult; error: undefined } {
-  expect(obj.error).toBeUndefined();
-  expect(obj.result).toBeDefined();
-
-  if (expectedProps) {
-    for (const [key, matcher] of Object.entries(expectedProps)) {
-      const actual = (obj.result as TResult)[key as keyof TResult];
-      expect(actual).toBeDefined();
-      if (typeof matcher === "function") {
-        matcher(actual);
-      } else {
-        expect(actual).toEqual(matcher);
-      }
-    }
-  }
-}
-
-function expectError<TResult>(
-  obj: ActionResult<TResult>,
-  expectedMessage?: string
-): asserts obj is { result: undefined; error: Error } {
-  expect(obj.error).toBeDefined();
-  expect(obj.error).toBeInstanceOf(Error);
-  expect(obj.result).toBeUndefined();
-
-  if (expectedMessage) {
-    expect(obj.error!.message).toBe(expectedMessage);
-  }
-}
+import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
 describe("ViewProduct", () => {
   it("should return the standard product with empty available options", () => {

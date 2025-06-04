@@ -5,22 +5,27 @@ export const productsFixture = (): Product[] => {
     {
       id: 1,
       type: "standard",
-      options: [],
+      availableOptions: [],
+      basePrice: 20,
     },
     {
       id: 2,
       type: "customizable",
-      options: [
+      availableOptions: [
         {
           id: 1,
+          price: 10,
         },
         {
           id: 2,
+          price: 20,
         },
         {
           id: 3,
+          price: 30,
         },
       ],
+      basePrice: 20,
     },
   ];
 
