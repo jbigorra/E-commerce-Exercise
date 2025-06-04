@@ -6,22 +6,17 @@ import {
 import { InMemoryInventory } from "../../../src/Store/Inventory/InMemoryInventory";
 import { ProductRepository } from "../../../src/Store/Inventory/InMemoryInventory";
 import { Product } from "../../../src/db";
+import { productsFixture } from "../../Fixtures/Inventory";
 
 describe("ViewProduct", () => {
   it("should return the standard product", () => {
-    const products: Product[] = [
-      {
-        id: 1,
-        type: "standard",
-        options: [],
-      },
-    ];
+    const products: Product[] = productsFixture();
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new ViewProduct(inventory);
 
     const actionResult = action.execute(new ViewProductCommand(1));
 
-    expect(actionResult).toMatchObject<ViewProductResult>({
+    expect(actionResult).toContain<ViewProductResult>({
       product: {
         id: 1,
         type: "standard",
@@ -31,23 +26,7 @@ describe("ViewProduct", () => {
   });
 
   it("should return the customizable product", () => {
-    const products: Product[] = [
-      {
-        id: 2,
-        type: "customizable",
-        options: [
-          {
-            id: 1,
-          },
-          {
-            id: 2,
-          },
-          {
-            id: 3,
-          },
-        ],
-      },
-    ];
+    const products: Product[] = productsFixture();
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new ViewProduct(inventory);
 
