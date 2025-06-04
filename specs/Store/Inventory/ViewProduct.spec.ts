@@ -61,6 +61,4 @@ describe("ViewProduct", () => {
       basePrice: expectedBasePrice,
     });
   });
-
-  it("should return the product marked as out of stock", () => {});
 });
