@@ -16,7 +16,7 @@ describe("ViewProduct", () => {
 
     const actionResult = action.execute(new ViewProductCommand(1));
 
-    expect(actionResult).toContain<ViewProductResult>({
+    expect(actionResult).toMatchObject<ViewProductResult>({
       product: {
         id: 1,
         type: "standard",
