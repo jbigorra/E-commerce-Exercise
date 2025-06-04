@@ -26,6 +26,7 @@ export const productsFixture = (): Product[] => {
         },
       ],
       basePrice: 20,
+      selectedOptions: [],
     },
   ];
 

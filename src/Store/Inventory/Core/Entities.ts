@@ -16,6 +16,7 @@ export type StandardProduct = {
 
 export type CustomizableProduct = {
   type: "customizable";
+  selectedOptions: ProductOption[];
 };
 
 export type Part = {
