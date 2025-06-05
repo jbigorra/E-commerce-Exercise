@@ -10,7 +10,16 @@ import {
   InMemoryInventory,
   ProductRepository,
 } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { productsFixture } from "../../Fixtures/Inventory";
+import {
+  CUSTOMIZABLE_PRODUCT_ID,
+  NOT_FOUND_PRODUCT_ID,
+  OPTION_1_ID,
+  OPTION_2_ID,
+  OPTION_3_ID,
+  productsFixture,
+  STANDARD_PRODUCT_ID,
+  UNAVAILABLE_OPTION_ID,
+} from "../../Fixtures/Inventory";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
 describe("SelectProductOption", () => {
@@ -19,7 +28,9 @@ describe("SelectProductOption", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new SelectProductOption(inventory);
 
-    const actionResult = action.execute(new SelectProductOptionCommand(100, 1));
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, 1)
+    );
 
     expectError(actionResult, "Product not found");
   });
@@ -29,7 +40,9 @@ describe("SelectProductOption", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new SelectProductOption(inventory);
 
-    const actionResult = action.execute(new SelectProductOptionCommand(1, 1));
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(STANDARD_PRODUCT_ID, 1)
+    );
 
     expectError(actionResult, "Product is not customizable");
   });
@@ -39,7 +52,12 @@ describe("SelectProductOption", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new SelectProductOption(inventory);
 
-    const actionResult = action.execute(new SelectProductOptionCommand(2, 100));
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(
+        CUSTOMIZABLE_PRODUCT_ID,
+        UNAVAILABLE_OPTION_ID
+      )
+    );
 
     expectError(actionResult, "Product option not found");
   });
@@ -49,10 +67,12 @@ describe("SelectProductOption", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new SelectProductOption(inventory);
 
-    const actionResult = action.execute(new SelectProductOptionCommand(2, 1));
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+    );
 
     expectSuccess(actionResult, {
-      id: 2,
+      id: CUSTOMIZABLE_PRODUCT_ID,
       selectedOptions: (opts: ProductOption[]) => {
         expect(opts).toEqual(
           expect.arrayContaining([expect.objectContaining({ id: 1 })])
@@ -67,15 +87,17 @@ describe("SelectProductOption", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new SelectProductOption(inventory);
 
-    const actionResult = action.execute(new SelectProductOptionCommand(2, 1));
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+    );
 
     expectSuccess(actionResult, {
-      id: 2,
+      id: CUSTOMIZABLE_PRODUCT_ID,
       availableOptions: (opts: ProductOption[]) => {
         expect(opts).toEqual(
           expect.arrayContaining([
-            expect.objectContaining({ id: 2 }),
-            expect.objectContaining({ id: 3 }),
+            expect.objectContaining({ id: OPTION_2_ID }),
+            expect.objectContaining({ id: OPTION_3_ID }),
           ])
         );
         expect(opts).toHaveLength(2);

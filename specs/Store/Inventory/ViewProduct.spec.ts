@@ -2,10 +2,17 @@ import {
   ViewProduct,
   ViewProductCommand,
 } from "../../../src/Store/Inventory/Actions/ViewProduct";
-import { InMemoryInventory } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { ProductRepository } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
 import { Product } from "../../../src/Store/Inventory/Core/Entities";
-import { productsFixture } from "../../Fixtures/Inventory";
+import {
+  InMemoryInventory,
+  ProductRepository,
+} from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import {
+  CUSTOMIZABLE_PRODUCT_ID,
+  NOT_FOUND_PRODUCT_ID,
+  productsFixture,
+  STANDARD_PRODUCT_ID,
+} from "../../Fixtures/Inventory";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
 describe("ViewProduct", () => {
@@ -14,12 +21,15 @@ describe("ViewProduct", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new ViewProduct(inventory);
 
-    const actionResult = action.execute(new ViewProductCommand(1));
+    const actionResult = action.execute(
+      new ViewProductCommand(STANDARD_PRODUCT_ID)
+    );
 
     expectSuccess<Product>(actionResult, {
-      id: 1,
+      id: STANDARD_PRODUCT_ID,
       type: "standard",
-      availableOptions: (opts: Product["availableOptions"]) => expect(opts).toEqual([])
+      availableOptions: (opts: Product["availableOptions"]) =>
+        expect(opts).toEqual([]),
     });
   });
 
@@ -28,12 +38,15 @@ describe("ViewProduct", () => {
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new ViewProduct(inventory);
 
-    const actionResult = action.execute(new ViewProductCommand(2));
+    const actionResult = action.execute(
+      new ViewProductCommand(CUSTOMIZABLE_PRODUCT_ID)
+    );
 
     expectSuccess<Product>(actionResult, {
-      id: 2,
+      id: CUSTOMIZABLE_PRODUCT_ID,
       type: "customizable",
-      availableOptions: (opts: Product["availableOptions"]) => expect(opts.length).toBeGreaterThan(0),
+      availableOptions: (opts: Product["availableOptions"]) =>
+        expect(opts.length).toBeGreaterThan(0),
     });
   });
 
@@ -41,24 +54,37 @@ describe("ViewProduct", () => {
     const products: Product[] = productsFixture();
     const inventory = new InMemoryInventory(new ProductRepository(products));
     const action = new ViewProduct(inventory);
-    const actionResult = action.execute(new ViewProductCommand(3));
+    const actionResult = action.execute(
+      new ViewProductCommand(NOT_FOUND_PRODUCT_ID)
+    );
     expectError(actionResult, "Product not found");
   });
 
   it.each([
-    { id: 1, expectedType: "standard" as const, expectedBasePrice: 20 },
-    { id: 2, expectedType: "customizable" as const, expectedBasePrice: 20 },
-  ])("should return the product with the base price", ({ id, expectedType, expectedBasePrice }) => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new ViewProduct(inventory);
+    {
+      id: STANDARD_PRODUCT_ID,
+      expectedType: "standard" as const,
+      expectedBasePrice: 20,
+    },
+    {
+      id: CUSTOMIZABLE_PRODUCT_ID,
+      expectedType: "customizable" as const,
+      expectedBasePrice: 20,
+    },
+  ])(
+    "should return the product with the base price",
+    ({ id, expectedType, expectedBasePrice }) => {
+      const products: Product[] = productsFixture();
+      const inventory = new InMemoryInventory(new ProductRepository(products));
+      const action = new ViewProduct(inventory);
 
-    const actionResult = action.execute(new ViewProductCommand(id));
+      const actionResult = action.execute(new ViewProductCommand(id));
 
-    expectSuccess<Product>(actionResult, {
-      id,
-      type: expectedType,
-      basePrice: expectedBasePrice,
-    });
-  });
+      expectSuccess<Product>(actionResult, {
+        id,
+        type: expectedType,
+        basePrice: expectedBasePrice,
+      });
+    }
+  );
 });
