@@ -10,6 +10,7 @@ import {
   InMemoryInventory,
   ProductRepository,
 } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import { IInventory } from "../../../src/Store/Inventory/Interfaces";
 import {
   CUSTOMIZABLE_PRODUCT_ID,
   NOT_FOUND_PRODUCT_ID,
@@ -23,91 +24,101 @@ import {
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
 describe("SelectProductOption", () => {
-  it("Should return error when product is not found", () => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new SelectProductOption(inventory);
+  describe("Errors", () => {
+    let products: Product[];
+    let inventory: IInventory;
 
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, 1)
-    );
+    beforeEach(() => {
+      products = productsFixture();
+      inventory = new InMemoryInventory(new ProductRepository(products));
+    });
 
-    expectError(actionResult, "Product not found");
-  });
+    it("Should return error when product is not found", () => {
+      const action = new SelectProductOption(inventory);
 
-  it("Should return error when selecting an option on a standard product", () => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new SelectProductOption(inventory);
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, 1)
+      );
 
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(STANDARD_PRODUCT_ID, 1)
-    );
+      expectError(actionResult, "Product not found");
+    });
 
-    expectError(actionResult, "Product is not customizable");
-  });
+    it("Should return error when selecting an option on a standard product", () => {
+      const action = new SelectProductOption(inventory);
 
-  it("Should return error when selecting unavailable options", () => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new SelectProductOption(inventory);
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(STANDARD_PRODUCT_ID, 1)
+      );
 
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        UNAVAILABLE_OPTION_ID
-      )
-    );
+      expectError(actionResult, "Product is not customizable");
+    });
 
-    expectError(actionResult, "Product option not found");
-  });
+    it("Should return error when selecting unavailable options", () => {
+      const action = new SelectProductOption(inventory);
 
-  it("should return the product with the selected option", () => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new SelectProductOption(inventory);
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          UNAVAILABLE_OPTION_ID
+        )
+      );
 
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
-    );
-
-    expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      selectedOptions: (opts: ProductOption[]) => {
-        expect(opts).toEqual(
-          expect.arrayContaining([expect.objectContaining({ id: 1 })])
-        );
-        expect(opts).toHaveLength(1);
-      },
+      expectError(actionResult, "Product option not found");
     });
   });
 
-  it("should return the product with available options reduced by 1 after selecting an option", () => {
-    const products: Product[] = productsFixture();
-    const inventory = new InMemoryInventory(new ProductRepository(products));
-    const action = new SelectProductOption(inventory);
+  describe("Success", () => {
+    let products: Product[];
+    let inventory: IInventory;
 
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
-    );
-
-    expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      availableOptions: (opts: ProductOption[]) => {
-        expect(opts).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({ id: OPTION_2_ID }),
-            expect.objectContaining({ id: OPTION_3_ID }),
-          ])
-        );
-        expect(opts).toHaveLength(2);
-      },
+    beforeEach(() => {
+      products = productsFixture();
+      inventory = new InMemoryInventory(new ProductRepository(products));
     });
+
+    it("should return the product with the selected option", () => {
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+      );
+
+      expectSuccess(actionResult, {
+        id: CUSTOMIZABLE_PRODUCT_ID,
+        selectedOptions: (opts: ProductOption[]) => {
+          expect(opts).toEqual(
+            expect.arrayContaining([expect.objectContaining({ id: 1 })])
+          );
+          expect(opts).toHaveLength(1);
+        },
+      });
+    });
+
+    it("should return the product with available options reduced by 1 after selecting an option", () => {
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+      );
+
+      expectSuccess(actionResult, {
+        id: CUSTOMIZABLE_PRODUCT_ID,
+        availableOptions: (opts: ProductOption[]) => {
+          expect(opts).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({ id: OPTION_2_ID }),
+              expect.objectContaining({ id: OPTION_3_ID }),
+            ])
+          );
+          expect(opts).toHaveLength(2);
+        },
+      });
+    });
+
+    it("should return the product with the current total price calculated", () => {});
+
+    it("should return the product marked as out of stock", () => {});
+
+    it("should return the product with allowed parts marked as out of stock", () => {});
   });
-
-  it("should return the product with the current total price calculated", () => {});
-
-  it("should return the product marked as out of stock", () => {});
-
-  it("should return the product with allowed parts marked as out of stock", () => {});
 });
