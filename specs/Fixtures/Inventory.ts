@@ -10,15 +10,8 @@ export const OPTION_3_ID = 3;
 
 export const productsFixture = (): Product[] => {
   const products: Product[] = [
-    {
-      id: STANDARD_PRODUCT_ID,
-      type: "standard",
-      availableOptions: [],
-      basePrice: 20,
-    },
-    {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      type: "customizable",
+    createStandardProduct(),
+    createCustomizableProduct({
       availableOptions: [
         {
           id: OPTION_1_ID,
@@ -35,8 +28,46 @@ export const productsFixture = (): Product[] => {
       ],
       basePrice: 20,
       selectedOptions: [],
-    },
+    }),
   ];
 
   return products;
+};
+
+const createStandardProduct = (
+  obj: Partial<Omit<Product, "availableOptions" | "selectedOptions">> = {}
+): Product => {
+  const defaults = {
+    id: STANDARD_PRODUCT_ID,
+    type: "standard" as const,
+    basePrice: 20,
+    availableOptions: [],
+    selectedOptions: [],
+  };
+
+  return new Product(
+    obj.id ?? defaults.id,
+    obj.type ?? defaults.type,
+    obj.basePrice ?? defaults.basePrice,
+    defaults.availableOptions,
+    defaults.selectedOptions
+  );
+};
+
+const createCustomizableProduct = (obj: Partial<Product> = {}): Product => {
+  const defaults = {
+    id: CUSTOMIZABLE_PRODUCT_ID,
+    type: "customizable" as const,
+    basePrice: 20,
+    availableOptions: [],
+    selectedOptions: [],
+  };
+
+  return new Product(
+    obj.id ?? defaults.id,
+    obj.type ?? defaults.type,
+    obj.basePrice ?? defaults.basePrice,
+    obj.availableOptions ?? defaults.availableOptions,
+    obj.selectedOptions ?? defaults.selectedOptions
+  );
 };
