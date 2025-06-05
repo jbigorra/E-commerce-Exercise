@@ -1,27 +1,19 @@
-import { IInventory } from "../Interfaces"
-import { Product } from "../Core/Entities"
+import { Product } from "../Core/Entities";
+import { IInventory } from "../Interfaces";
+import { ActionResult, Application } from "./Action";
 
 export class ViewProductCommand {
-    constructor(
-        readonly productId: number
-    ) {}
+  constructor(readonly productId: number) {}
 }
 
-export type ActionResult<TResult> =
-  | { result: TResult, error: undefined }
-  | { result: undefined, error: Error }
-
 export class ViewProduct {
-    constructor(private readonly inventory: IInventory) {}
+  constructor(private readonly inventory: IInventory) {}
 
-    public execute(command: ViewProductCommand): ActionResult<Product> {
-      const product = this.inventory.products.findById(command.productId)
+  public execute(command: ViewProductCommand): ActionResult<Product> {
+    const product = this.inventory.products.findById(command.productId);
 
-      if (!product) return { result: undefined, error: new Error("Product not found") }
+    if (!product) return Application.error(new Error("Product not found"));
 
-      return {
-        result: product,
-        error: undefined
-      }
-    }
+    return Application.success(product);
+  }
 }

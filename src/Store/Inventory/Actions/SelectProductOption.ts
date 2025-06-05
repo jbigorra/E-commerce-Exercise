@@ -1,6 +1,6 @@
 import { Product } from "../Core/Entities";
 import { IInventory } from "../Interfaces";
-import { ActionResult } from "./ViewProduct";
+import { ActionResult, Application } from "./Action";
 
 export class SelectProductOptionCommand {
   constructor(readonly productId: number, readonly optionId: number) {}
@@ -12,32 +12,14 @@ export class SelectProductOption {
   public execute(command: SelectProductOptionCommand): ActionResult<Product> {
     const product = this.inventory.products.findById(command.productId);
 
-    if (!product) {
-      return { result: undefined, error: new Error("Product not found") };
-    }
+    if (!product) return Application.error(new Error("Product not found"));
+    if (product.isNotCustomizable())
+      return Application.error(new Error("Product is not customizable"));
 
-    if (product.type === "standard") {
-      return {
-        result: undefined,
-        error: new Error("Product is not customizable"),
-      };
-    }
+    const { error } = product.customizeWith(command.optionId);
 
-    const optionIndex = product.availableOptions.findIndex(
-      (o) => o.id === command.optionId
-    );
+    if (error) return Application.error(error);
 
-    if (optionIndex === -1) {
-      return {
-        result: undefined,
-        error: new Error("Product option not found"),
-      };
-    }
-
-    const option = product.availableOptions.splice(optionIndex, 1)[0];
-
-    product.selectedOptions.push(option);
-
-    return { result: product, error: undefined };
+    return Application.success(product);
   }
 }
