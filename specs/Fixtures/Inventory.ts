@@ -1,4 +1,7 @@
-import { Product } from "../../src/Store/Inventory/Core/Entities";
+import {
+  Product,
+  ProductOption,
+} from "../../src/Store/Inventory/Core/Entities";
 
 export const NOT_FOUND_PRODUCT_ID = 100;
 export const UNAVAILABLE_OPTION_ID = 100;
@@ -11,8 +14,9 @@ export const OPTION_3_ID = 3;
 export const productsFixture = (): Product[] => {
   const products: Product[] = [
     createStandardProduct(),
-    createCustomizableProduct({
-      availableOptions: [
+    createCustomizableProduct(
+      {},
+      [
         {
           id: OPTION_1_ID,
           price: 10,
@@ -26,17 +30,14 @@ export const productsFixture = (): Product[] => {
           price: 30,
         },
       ],
-      basePrice: 20,
-      selectedOptions: [],
-    }),
+      []
+    ),
   ];
 
   return products;
 };
 
-const createStandardProduct = (
-  obj: Partial<Omit<Product, "availableOptions" | "selectedOptions">> = {}
-): Product => {
+const createStandardProduct = (obj: Partial<Product> = {}): Product => {
   const defaults = {
     id: STANDARD_PRODUCT_ID,
     type: "standard" as const,
@@ -54,20 +55,22 @@ const createStandardProduct = (
   );
 };
 
-const createCustomizableProduct = (obj: Partial<Product> = {}): Product => {
+const createCustomizableProduct = (
+  obj: Partial<Product> = {},
+  availableOptions: ProductOption[] = [],
+  selectedOptions: ProductOption[] = []
+): Product => {
   const defaults = {
     id: CUSTOMIZABLE_PRODUCT_ID,
     type: "customizable" as const,
     basePrice: 20,
-    availableOptions: [],
-    selectedOptions: [],
   };
 
   return new Product(
     obj.id ?? defaults.id,
     obj.type ?? defaults.type,
     obj.basePrice ?? defaults.basePrice,
-    obj.availableOptions ?? defaults.availableOptions,
-    obj.selectedOptions ?? defaults.selectedOptions
+    availableOptions,
+    selectedOptions
   );
 };

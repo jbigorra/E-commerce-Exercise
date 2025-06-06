@@ -24,19 +24,33 @@ export type ProductOption = {
 };
 
 export class Product {
+  private _availableOptions: ProductOption[];
+  private _selectedOptions: ProductOption[];
+
   constructor(
     readonly id: number,
     readonly type: ProductType,
     readonly basePrice: number,
-    readonly availableOptions: ProductOption[],
-    readonly selectedOptions: ProductOption[]
-  ) {}
+    availableOptions: ProductOption[],
+    selectedOptions: ProductOption[]
+  ) {
+    this._availableOptions = availableOptions;
+    this._selectedOptions = selectedOptions;
+  }
 
   public get totalPrice(): number {
     return (
       this.basePrice +
-      this.selectedOptions.reduce((acc, option) => acc + option.price, 0)
+      this._selectedOptions.reduce((acc, option) => acc + option.price, 0)
     );
+  }
+
+  public get availableOptions(): ProductOption[] {
+    return this._availableOptions;
+  }
+
+  public get selectedOptions(): ProductOption[] {
+    return this._selectedOptions;
   }
 
   private _isNotCustomizable(): boolean {
@@ -50,14 +64,9 @@ export class Product {
       };
     }
 
-    // if (this._selectedOptionsNotValid(optionIds)) {
-    //   return {
-    //     error: new Error("Selected options are not valid"),
-    //   };
-    // }
-
+    const validOptions: ProductOption[] = [];
     for (const optionId of optionIds) {
-      const optionIdx = this.availableOptions.findIndex(
+      const optionIdx = this._availableOptions.findIndex(
         (o) => o.id === optionId
       );
 
@@ -67,16 +76,16 @@ export class Product {
         };
       }
 
-      this.selectedOptions.push(this.availableOptions[optionIdx]);
-      this.availableOptions.splice(optionIdx, 1);
+      validOptions.push(this._availableOptions[optionIdx]);
     }
 
-    return { error: undefined };
-  }
+    validOptions.forEach((vo) => {
+      this._availableOptions = this._availableOptions.filter(
+        (op) => op.id !== vo.id
+      );
+      this._selectedOptions = [...this._selectedOptions, vo];
+    });
 
-  private _selectedOptionsNotValid(optionIds: number[]): boolean {
-    return optionIds.some(
-      (id) => !this.availableOptions.some((o) => o.id === id)
-    );
+    return { error: undefined };
   }
 }

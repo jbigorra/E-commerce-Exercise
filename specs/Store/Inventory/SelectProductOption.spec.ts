@@ -93,7 +93,7 @@ describe("SelectProductOption", () => {
       });
     });
 
-    it("should return the product with available options reduced by 1 after selecting an option", () => {
+    it("should return the product with 2 available options after selecting 1", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
@@ -110,6 +110,26 @@ describe("SelectProductOption", () => {
             ])
           );
           expect(opts).toHaveLength(2);
+        },
+      });
+    });
+
+    it("should return the product with 0 available options after selecting 3", () => {
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
+          OPTION_1_ID,
+          OPTION_2_ID,
+          OPTION_3_ID,
+        ])
+      );
+
+      expectSuccess(actionResult, {
+        id: CUSTOMIZABLE_PRODUCT_ID,
+        availableOptions: (opts: ProductOption[]) => {
+          expect(opts).toEqual([]);
+          expect(opts).toHaveLength(0);
         },
       });
     });
