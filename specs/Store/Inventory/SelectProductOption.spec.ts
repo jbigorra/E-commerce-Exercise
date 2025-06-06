@@ -37,7 +37,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, 1)
+        new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, [OPTION_1_ID])
       );
 
       expectError(actionResult, "Product not found");
@@ -47,7 +47,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(STANDARD_PRODUCT_ID, 1)
+        new SelectProductOptionCommand(STANDARD_PRODUCT_ID, [OPTION_1_ID])
       );
 
       expectError(actionResult, "Product is not customizable");
@@ -57,10 +57,9 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(
-          CUSTOMIZABLE_PRODUCT_ID,
-          UNAVAILABLE_OPTION_ID
-        )
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
+          UNAVAILABLE_OPTION_ID,
+        ])
       );
 
       expectError(actionResult, "Product option not found");
@@ -80,7 +79,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [OPTION_1_ID])
       );
 
       expectSuccess(actionResult, {
@@ -98,7 +97,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, OPTION_1_ID)
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [OPTION_1_ID])
       );
 
       expectSuccess(actionResult, {
@@ -115,7 +114,20 @@ describe("SelectProductOption", () => {
       });
     });
 
-    it("should return the product with the current total price calculated", () => {});
+    it("should sum up with the current total price calculated", () => {
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [OPTION_1_ID])
+      );
+
+      expectSuccess(actionResult, {
+        id: CUSTOMIZABLE_PRODUCT_ID,
+        totalPrice: (price: number) => {
+          expect(price).toBe(100);
+        },
+      });
+    });
 
     it("should return the product marked as out of stock", () => {});
 

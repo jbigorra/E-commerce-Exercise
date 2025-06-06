@@ -3,7 +3,7 @@ import { IInventory } from "../Interfaces";
 import { ActionResult, Application } from "./Action";
 
 export class SelectProductOptionCommand {
-  constructor(readonly productId: number, readonly optionId: number) {}
+  constructor(readonly productId: number, readonly optionIds: number[]) {}
 }
 
 export class SelectProductOption {
@@ -16,7 +16,7 @@ export class SelectProductOption {
     if (product.isNotCustomizable())
       return Application.error(new Error("Product is not customizable"));
 
-    const { error } = product.customizeWith(command.optionId);
+    const { error } = product.customizeWith(command.optionIds);
 
     if (error) return Application.error(error);
 

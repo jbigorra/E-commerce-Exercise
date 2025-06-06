@@ -43,19 +43,34 @@ export class Product {
     return this.type === "standard";
   }
 
-  public customizeWith(optionId: number): { error: Error | undefined } {
-    const idx = this.availableOptions.findIndex((o) => o.id === optionId);
+  public customizeWith(optionIds: number[]): { error: Error | undefined } {
+    // if (this._selectedOptionsNotValid(optionIds)) {
+    //   return {
+    //     error: new Error("Selected options are not valid"),
+    //   };
+    // }
 
-    if (idx === -1) {
-      return {
-        error: new Error("Product option not found"),
-      };
+    for (const optionId of optionIds) {
+      const optionIdx = this.availableOptions.findIndex(
+        (o) => o.id === optionId
+      );
+
+      if (optionIdx === -1) {
+        return {
+          error: new Error("Product option not found"),
+        };
+      }
+
+      this.selectedOptions.push(this.availableOptions[optionIdx]);
+      this.availableOptions.splice(optionIdx, 1);
     }
 
-    const option = this.availableOptions.splice(idx, 1)[0];
-
-    this.selectedOptions.push(option);
-
     return { error: undefined };
+  }
+
+  private _selectedOptionsNotValid(optionIds: number[]): boolean {
+    return optionIds.some(
+      (id) => !this.availableOptions.some((o) => o.id === id)
+    );
   }
 }
