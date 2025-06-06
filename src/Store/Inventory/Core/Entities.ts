@@ -39,11 +39,17 @@ export class Product {
     );
   }
 
-  public isNotCustomizable(): boolean {
+  private _isNotCustomizable(): boolean {
     return this.type === "standard";
   }
 
   public customizeWith(optionIds: number[]): { error: Error | undefined } {
+    if (this._isNotCustomizable()) {
+      return {
+        error: new Error("Product is not customizable"),
+      };
+    }
+
     // if (this._selectedOptionsNotValid(optionIds)) {
     //   return {
     //     error: new Error("Selected options are not valid"),

@@ -13,8 +13,6 @@ export class SelectProductOption {
     const product = this.inventory.products.findById(command.productId);
 
     if (!product) return Application.error(new Error("Product not found"));
-    if (product.isNotCustomizable())
-      return Application.error(new Error("Product is not customizable"));
 
     const { error } = product.customizeWith(command.optionIds);
 
