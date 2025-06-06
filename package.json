@@ -1,16 +1,16 @@
 {
-  "name": "factorial-hr-challenge",
+  "name": "challenge",
   "version": "1.0.0",
-  "description": "Technical challenge provided by Factorial HR engineering team",
+  "description": "Technical challenge provided by a company",
   "main": "main.ts",
   "scripts": {
     "test": "jest --i",
+    "test:coverage": "bun test --coverage",
     "tdd": "bun test --watch",
     "build": "tsc"
   },
   "keywords": [
     "challenge",
-    "factorial",
     "typescript"
   ],
   "author": "Juan Bigorra",
