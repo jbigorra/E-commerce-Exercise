@@ -13,6 +13,7 @@ import {
 import { IInventory } from "../../../src/Store/Inventory/Interfaces";
 import {
   CUSTOMIZABLE_PRODUCT_ID,
+  EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE,
   NOT_FOUND_PRODUCT_ID,
   OPTION_1_ID,
   OPTION_2_ID,
@@ -134,17 +135,21 @@ describe("SelectProductOption", () => {
       });
     });
 
-    it("should sum up with the current total price calculated", () => {
+    it("should return the product with the total price calculated", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [OPTION_1_ID])
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
+          OPTION_1_ID,
+          OPTION_2_ID,
+          OPTION_3_ID,
+        ])
       );
 
       expectSuccess(actionResult, {
         id: CUSTOMIZABLE_PRODUCT_ID,
         totalPrice: (price: number) => {
-          expect(price).toBe(100);
+          expect(price).toBe(EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE);
         },
       });
     });
