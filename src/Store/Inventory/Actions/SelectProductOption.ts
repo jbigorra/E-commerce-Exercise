@@ -3,7 +3,11 @@ import { IInventory } from "../Interfaces";
 import { ActionResult, Application } from "./Action";
 
 export class SelectProductOptionCommand {
-  constructor(readonly productId: number, readonly optionIds: number[]) {}
+  constructor(
+    readonly productId: number,
+    readonly optionIds: number[] = [],
+    readonly optionChoicesIds: number[] = []
+  ) {}
 }
 
 export class SelectProductOption {

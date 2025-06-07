@@ -44,10 +44,11 @@ export class Product {
   }
 
   public get totalPrice(): number {
-    return (
-      this.basePrice +
-      this._options.reduce((acc, option) => acc + option.price, 0)
-    );
+    const selectedOptionsTotalPrice = this._options
+      .filter((o) => o.selected)
+      .reduce((acc, o) => acc + o.price, 0);
+
+    return this.basePrice + selectedOptionsTotalPrice;
   }
 
   public get options(): ProductOption[] {
@@ -60,7 +61,7 @@ export class Product {
 
   public customizeWith(
     optionIds: number[],
-    optionChoicesIds: number[]
+    optionChoicesIds: number[] = []
   ): { error: Error | undefined } {
     if (this._isNotCustomizable()) {
       return {
