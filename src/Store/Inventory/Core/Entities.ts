@@ -103,23 +103,19 @@ export class Product {
 
       option.selected = true;
 
-      if (optionChoicesIds.length > 0) {
-        for (const optionChoiceId of optionChoicesIds) {
-          const optionChoice = this._optionChoices.find(
-            (oc) => oc.id === optionChoiceId && oc.optionId === optionId
-          );
+      const choiceToSelect = this._optionChoices
+        .filter((oc) => oc.optionId === optionId)
+        .filter((oc) => optionChoicesIds.includes(oc.id));
 
-          if (!optionChoice) {
-            return {
-              error: new Error(
-                `Product option choice with Id = ${optionChoiceId} not found`
-              ),
-            };
-          }
-
-          optionChoice.selected = true;
-        }
+      if (choiceToSelect.length === 0) {
+        continue;
       }
+
+      if (choiceToSelect.length > 1) {
+        return { error: new Error("Only one option choice can be selected") };
+      }
+
+      choiceToSelect[0].selected = true;
     }
 
     return { error: undefined };

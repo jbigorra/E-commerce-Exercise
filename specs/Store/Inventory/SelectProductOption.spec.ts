@@ -84,6 +84,23 @@ describe("SelectProductOption", () => {
         "At least one product option must be selected to customize the product"
       );
     });
+
+    it("Should return error when selecting more than one option choice for the same option", () => {
+      const products = productsWithOptionChoicesFixture();
+      const inventory = new InMemoryInventory(new ProductRepository(products));
+
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          [OPTION_1_ID],
+          [1, 2]
+        )
+      );
+
+      expectError(actionResult, "Only one option choice can be selected");
+    });
   });
 
   describe("Success", () => {
