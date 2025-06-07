@@ -18,7 +18,10 @@ export class SelectProductOption {
 
     if (!product) return Application.error(new Error("Product not found"));
 
-    const { error } = product.customizeWith(command.optionIds);
+    const { error } = product.customizeWith(
+      command.optionIds,
+      command.optionChoicesIds
+    );
 
     if (error) return Application.error(error);
 

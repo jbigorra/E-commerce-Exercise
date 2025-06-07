@@ -14,12 +14,12 @@ import { IInventory } from "../../../src/Store/Inventory/Interfaces";
 import {
   CUSTOMIZABLE_PRODUCT_ID,
   EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE,
-  EXPECTED_TOTAL_STANDARD_PRODUCT_PRICE,
   NOT_FOUND_PRODUCT_ID,
   OPTION_1_ID,
   OPTION_2_ID,
   OPTION_3_ID,
   productsFixture,
+  productsWithOptionChoicesFixture,
   STANDARD_PRODUCT_ID,
   UNAVAILABLE_OPTION_ID,
 } from "../../Fixtures/Inventory";
@@ -39,7 +39,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, [OPTION_1_ID])
+        new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, [OPTION_1_ID], [])
       );
 
       expectError(actionResult, "Product not found");
@@ -49,7 +49,7 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(STANDARD_PRODUCT_ID, [OPTION_1_ID])
+        new SelectProductOptionCommand(STANDARD_PRODUCT_ID, [OPTION_1_ID], [])
       );
 
       expectError(actionResult, "Product is not customizable");
@@ -59,14 +59,29 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
-          UNAVAILABLE_OPTION_ID,
-        ])
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          [UNAVAILABLE_OPTION_ID],
+          []
+        )
       );
 
       expectError(
         actionResult,
         `Product option with Id = ${UNAVAILABLE_OPTION_ID} not found`
+      );
+    });
+
+    it("Should return error when no options are selected", () => {
+      const action = new SelectProductOption(inventory);
+
+      const actionResult = action.execute(
+        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [], [])
+      );
+
+      expectError(
+        actionResult,
+        "At least one product option must be selected to customize the product"
       );
     });
   });
@@ -84,7 +99,11 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [OPTION_1_ID])
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          [OPTION_1_ID],
+          []
+        )
       );
 
       expectSuccess(actionResult, {
@@ -105,10 +124,11 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
-          OPTION_1_ID,
-          OPTION_2_ID,
-        ])
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          [OPTION_1_ID, OPTION_2_ID],
+          []
+        )
       );
 
       expectSuccess(actionResult, {
@@ -129,11 +149,11 @@ describe("SelectProductOption", () => {
       const action = new SelectProductOption(inventory);
 
       const actionResult = action.execute(
-        new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
-          OPTION_1_ID,
-          OPTION_2_ID,
-          OPTION_3_ID,
-        ])
+        new SelectProductOptionCommand(
+          CUSTOMIZABLE_PRODUCT_ID,
+          [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
+          []
+        )
       );
 
       expectSuccess(actionResult, {
@@ -155,11 +175,11 @@ describe("SelectProductOption", () => {
         const action = new SelectProductOption(inventory);
 
         const actionResult = action.execute(
-          new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [
-            OPTION_1_ID,
-            OPTION_2_ID,
-            OPTION_3_ID,
-          ])
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
+            []
+          )
         );
 
         expectSuccess(actionResult, {
@@ -169,18 +189,34 @@ describe("SelectProductOption", () => {
           },
         });
       });
+    });
 
-      it("should return the product with the total price equal to the base price when no options are selected", () => {
+    describe("Price adjustments based on option choices", () => {
+      beforeEach(() => {
+        products = productsWithOptionChoicesFixture();
+        inventory = new InMemoryInventory(new ProductRepository(products));
+      });
+
+      it("should return the product total price considering the option choices selected", () => {
         const action = new SelectProductOption(inventory);
 
         const actionResult = action.execute(
-          new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [])
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID],
+            [1]
+          )
         );
 
+        const productBasePrice = 20;
+        const option1Price = 10;
+        const option1Choice1PriceAdjustment = 10;
+        const expectedPrice =
+          productBasePrice + option1Price + option1Choice1PriceAdjustment;
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
           totalPrice: (price: number) => {
-            expect(price).toBe(EXPECTED_TOTAL_STANDARD_PRODUCT_PRICE);
+            expect(price).toBe(expectedPrice);
           },
         });
       });
