@@ -21,70 +21,64 @@ export type Inventory = {
 export type ProductOption = {
   id: number;
   price: number;
+  choices: ProductOptionChoice[];
+  selected: boolean;
+};
+
+export type ProductOptionChoice = {
+  id: number;
+  optionId: number;
+  priceAdjustment: number;
 };
 
 export class Product {
-  private _availableOptions: ProductOption[];
-  private _selectedOptions: ProductOption[];
+  private _options: ProductOption[];
 
   constructor(
     readonly id: number,
     readonly type: ProductType,
     readonly basePrice: number,
-    availableOptions: ProductOption[],
-    selectedOptions: ProductOption[]
+    options: ProductOption[]
   ) {
-    this._availableOptions = availableOptions;
-    this._selectedOptions = selectedOptions;
+    this._options = options;
   }
 
   public get totalPrice(): number {
     return (
       this.basePrice +
-      this._selectedOptions.reduce((acc, option) => acc + option.price, 0)
+      this._options.reduce((acc, option) => acc + option.price, 0)
     );
   }
 
-  public get availableOptions(): ProductOption[] {
-    return this._availableOptions;
-  }
-
-  public get selectedOptions(): ProductOption[] {
-    return this._selectedOptions;
+  public get options(): ProductOption[] {
+    return this._options;
   }
 
   private _isNotCustomizable(): boolean {
     return this.type === "standard";
   }
 
-  public customizeWith(optionIds: number[]): { error: Error | undefined } {
+  public customizeWith(
+    optionIds: number[],
+    optionChoicesIds: number[]
+  ): { error: Error | undefined } {
     if (this._isNotCustomizable()) {
       return {
         error: new Error("Product is not customizable"),
       };
     }
 
-    const validOptions: ProductOption[] = [];
     for (const optionId of optionIds) {
-      const optionIdx = this._availableOptions.findIndex(
-        (o) => o.id === optionId
-      );
+      const option = this._options.find((o) => o.id === optionId);
 
-      if (optionIdx === -1) {
+      if (!option) {
         return {
-          error: new Error("Product option not found"),
+          error: new Error(`Product option with Id = ${optionId} not found`),
         };
       }
 
-      validOptions.push(this._availableOptions[optionIdx]);
+      option.selected = true;
     }
-
-    validOptions.forEach((vo) => {
-      this._availableOptions = this._availableOptions.filter(
-        (op) => op.id !== vo.id
-      );
-      this._selectedOptions = [...this._selectedOptions, vo];
-    });
 
     return { error: undefined };
   }

@@ -1,6 +1,7 @@
 import {
   Product,
   ProductOption,
+  ProductOptionChoice,
 } from "../../src/Store/Inventory/Core/Entities";
 
 export const NOT_FOUND_PRODUCT_ID = 100;
@@ -16,23 +17,46 @@ export const EXPECTED_TOTAL_STANDARD_PRODUCT_PRICE = 20;
 export const productsFixture = (): Product[] => {
   const products: Product[] = [
     createStandardProduct(),
+    createCustomizableProduct({}, createProductOptions({ choices: [] })),
+  ];
+
+  return products;
+};
+
+export const productsWithOptionChoicesFixture = (): Product[] => {
+  const products: Product[] = [
+    createStandardProduct(),
     createCustomizableProduct(
       {},
-      [
-        {
-          id: OPTION_1_ID,
-          price: 10,
-        },
-        {
-          id: OPTION_2_ID,
-          price: 20,
-        },
-        {
-          id: OPTION_3_ID,
-          price: 30,
-        },
-      ],
-      []
+      createProductOptions({
+        choices: [
+          {
+            id: 1,
+            optionId: OPTION_1_ID,
+            priceAdjustment: 10,
+          },
+          {
+            id: 2,
+            optionId: OPTION_1_ID,
+            priceAdjustment: 30,
+          },
+          {
+            id: 3,
+            optionId: OPTION_2_ID,
+            priceAdjustment: 20,
+          },
+          {
+            id: 4,
+            optionId: OPTION_3_ID,
+            priceAdjustment: 5,
+          },
+          {
+            id: 5,
+            optionId: OPTION_3_ID,
+            priceAdjustment: 15,
+          },
+        ],
+      })
     ),
   ];
 
@@ -44,23 +68,20 @@ const createStandardProduct = (obj: Partial<Product> = {}): Product => {
     id: STANDARD_PRODUCT_ID,
     type: "standard" as const,
     basePrice: 20,
-    availableOptions: [],
-    selectedOptions: [],
+    options: [],
   };
 
   return new Product(
     obj.id ?? defaults.id,
     obj.type ?? defaults.type,
     obj.basePrice ?? defaults.basePrice,
-    defaults.availableOptions,
-    defaults.selectedOptions
+    defaults.options
   );
 };
 
 const createCustomizableProduct = (
   obj: Partial<Product> = {},
-  availableOptions: ProductOption[] = [],
-  selectedOptions: ProductOption[] = []
+  options: ProductOption[] = []
 ): Product => {
   const defaults = {
     id: CUSTOMIZABLE_PRODUCT_ID,
@@ -72,7 +93,40 @@ const createCustomizableProduct = (
     obj.id ?? defaults.id,
     obj.type ?? defaults.type,
     obj.basePrice ?? defaults.basePrice,
-    availableOptions,
-    selectedOptions
+    options
   );
+};
+
+const createProductOptions = ({
+  choices,
+}: {
+  choices: ProductOptionChoice[];
+}): ProductOption[] => {
+  const addChoices = (option: ProductOption) => ({
+    ...option,
+    choices: choices.filter((choice) => choice.optionId === option.id),
+  });
+
+  const options = [
+    {
+      id: OPTION_1_ID,
+      price: 10,
+      choices: [],
+      selected: false,
+    },
+    {
+      id: OPTION_2_ID,
+      price: 20,
+      choices: [],
+      selected: false,
+    },
+    {
+      id: OPTION_3_ID,
+      price: 30,
+      choices: [],
+      selected: false,
+    },
+  ];
+
+  return options.map(addChoices);
 };

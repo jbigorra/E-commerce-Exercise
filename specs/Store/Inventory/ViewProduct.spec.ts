@@ -47,8 +47,7 @@ describe("ViewProduct", () => {
       expectSuccess<Product>(actionResult, {
         id: STANDARD_PRODUCT_ID,
         type: "standard",
-        availableOptions: (opts: Product["availableOptions"]) =>
-          expect(opts).toEqual([]),
+        options: (opts: Product["options"]) => expect(opts).toEqual([]),
       });
     });
 
@@ -62,8 +61,8 @@ describe("ViewProduct", () => {
       expectSuccess<Product>(actionResult, {
         id: CUSTOMIZABLE_PRODUCT_ID,
         type: "customizable",
-        availableOptions: (opts: Product["availableOptions"]) =>
-          expect(opts.length).toBeGreaterThan(0),
+        options: (opts: Product["options"]) =>
+          expect(opts.length).toBeGreaterThanOrEqual(3),
       });
     });
 
