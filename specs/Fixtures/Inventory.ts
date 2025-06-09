@@ -13,6 +13,8 @@ export const OPTION_2_ID = 2;
 export const OPTION_3_ID = 3;
 export const EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE = 80;
 export const EXPECTED_TOTAL_STANDARD_PRODUCT_PRICE = 20;
+export const CONSTRAINED_OPTION_CHOICE_ID = 5;
+export const CONSTRAINING_OPTION_CHOICE_ID = 1;
 
 export const productsFixture = (): Product[] => {
   const products: Product[] = [
@@ -24,6 +26,19 @@ export const productsFixture = (): Product[] => {
 };
 
 export const productsWithOptionChoicesFixture = (): Product[] => {
+  const products: Product[] = [
+    createStandardProduct(),
+    createCustomizableProduct(
+      {},
+      createProductOptions(),
+      createProductOptionChoices()
+    ),
+  ];
+
+  return products;
+};
+
+export const productsWithIncompatibleConstraintsFixture = (): Product[] => {
   const products: Product[] = [
     createStandardProduct(),
     createCustomizableProduct(
@@ -103,30 +118,61 @@ const createProductOptionChoices = (): ProductOptionChoice[] => {
       optionId: OPTION_1_ID,
       priceAdjustment: 10,
       selected: false,
+      disabled: false,
+      constraints: [],
     },
     {
       id: 2,
       optionId: OPTION_1_ID,
       priceAdjustment: 30,
       selected: false,
+      disabled: false,
+      constraints: [],
     },
     {
       id: 3,
       optionId: OPTION_2_ID,
       priceAdjustment: 20,
       selected: false,
+      disabled: false,
+      constraints: [],
     },
     {
       id: 4,
       optionId: OPTION_3_ID,
       priceAdjustment: 5,
       selected: false,
+      disabled: false,
+      constraints: [
+        {
+          id: 1,
+          optionChoiceId: 4,
+          type: "price" as const,
+          constrainedBy: OPTION_3_ID,
+          priceAdjustment: 10,
+        },
+      ],
     },
     {
       id: 5,
       optionId: OPTION_3_ID,
       priceAdjustment: 15,
       selected: false,
+      disabled: false,
+      constraints: [
+        {
+          id: 2,
+          optionChoiceId: 5,
+          type: "incompatible" as const,
+          constrainedBy: OPTION_1_ID,
+        },
+        {
+          id: 3,
+          optionChoiceId: 5,
+          type: "incompatible" as const,
+          constrainedBy: OPTION_2_ID,
+        },
+      ],
     },
   ];
 

@@ -5,6 +5,7 @@ import {
 import {
   Product,
   ProductOption,
+  ProductOptionChoice,
 } from "../../../src/Store/Inventory/Core/Entities";
 import {
   InMemoryInventory,
@@ -12,6 +13,8 @@ import {
 } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
 import { IInventory } from "../../../src/Store/Inventory/Interfaces";
 import {
+  CONSTRAINED_OPTION_CHOICE_ID,
+  CONSTRAINING_OPTION_CHOICE_ID,
   CUSTOMIZABLE_PRODUCT_ID,
   EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE,
   NOT_FOUND_PRODUCT_ID,
@@ -19,6 +22,7 @@ import {
   OPTION_2_ID,
   OPTION_3_ID,
   productsFixture,
+  productsWithIncompatibleConstraintsFixture,
   productsWithOptionChoicesFixture,
   STANDARD_PRODUCT_ID,
   UNAVAILABLE_OPTION_ID,
@@ -112,78 +116,138 @@ describe("SelectProductOption", () => {
       inventory = new InMemoryInventory(new ProductRepository(products));
     });
 
-    it("should return the product with 1 selected option", () => {
-      const action = new SelectProductOption(inventory);
+    describe("Option & Choice selection", () => {
+      it("should return the product with 1 selected option", () => {
+        const action = new SelectProductOption(inventory);
 
-      const actionResult = action.execute(
-        new SelectProductOptionCommand(
-          CUSTOMIZABLE_PRODUCT_ID,
-          [OPTION_1_ID],
-          []
-        )
-      );
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID],
+            []
+          )
+        );
 
-      expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
-        options: (opts: ProductOption[]) => {
-          expect(opts).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: false }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: false }),
-            ])
-          );
-        },
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          options: (opts: ProductOption[]) => {
+            expect(opts).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({ id: OPTION_1_ID, selected: true }),
+                expect.objectContaining({ id: OPTION_2_ID, selected: false }),
+                expect.objectContaining({ id: OPTION_3_ID, selected: false }),
+              ])
+            );
+          },
+        });
       });
-    });
 
-    it("should return the product with 2 selected options", () => {
-      const action = new SelectProductOption(inventory);
+      it("should return the product with 2 selected options", () => {
+        const action = new SelectProductOption(inventory);
 
-      const actionResult = action.execute(
-        new SelectProductOptionCommand(
-          CUSTOMIZABLE_PRODUCT_ID,
-          [OPTION_1_ID, OPTION_2_ID],
-          []
-        )
-      );
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID, OPTION_2_ID],
+            []
+          )
+        );
 
-      expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
-        options: (opts: ProductOption[]) => {
-          expect(opts).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: false }),
-            ])
-          );
-        },
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          options: (opts: ProductOption[]) => {
+            expect(opts).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({ id: OPTION_1_ID, selected: true }),
+                expect.objectContaining({ id: OPTION_2_ID, selected: true }),
+                expect.objectContaining({ id: OPTION_3_ID, selected: false }),
+              ])
+            );
+          },
+        });
       });
-    });
 
-    it("should return the product with 3 selected options", () => {
-      const action = new SelectProductOption(inventory);
+      it("should return the product with 3 selected options", () => {
+        const action = new SelectProductOption(inventory);
 
-      const actionResult = action.execute(
-        new SelectProductOptionCommand(
-          CUSTOMIZABLE_PRODUCT_ID,
-          [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
-          []
-        )
-      );
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
+            []
+          )
+        );
 
-      expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
-        options: (opts: ProductOption[]) => {
-          expect(opts).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: true }),
-            ])
-          );
-        },
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          options: (opts: ProductOption[]) => {
+            expect(opts).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({ id: OPTION_1_ID, selected: true }),
+                expect.objectContaining({ id: OPTION_2_ID, selected: true }),
+                expect.objectContaining({ id: OPTION_3_ID, selected: true }),
+              ])
+            );
+          },
+        });
+      });
+
+      it("should return the product with 1 option choice selected", () => {
+        const products = productsWithOptionChoicesFixture();
+        const inventory = new InMemoryInventory(
+          new ProductRepository(products)
+        );
+
+        const action = new SelectProductOption(inventory);
+
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID],
+            [1]
+          )
+        );
+
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          optionChoices: (choices: ProductOptionChoice[]) => {
+            expect(choices).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({ id: 1, selected: true }),
+              ])
+            );
+            expect(choices.filter((c) => c.selected).length).toBe(1);
+          },
+        });
+      });
+      it("should return the product with 2 option choices selected", () => {
+        const products = productsWithOptionChoicesFixture();
+        const inventory = new InMemoryInventory(
+          new ProductRepository(products)
+        );
+
+        const action = new SelectProductOption(inventory);
+
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID, OPTION_2_ID],
+            [1, 3]
+          )
+        );
+
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          optionChoices: (choices: ProductOptionChoice[]) => {
+            expect(choices).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({ id: 1, selected: true }),
+                expect.objectContaining({ id: 3, selected: true }),
+              ])
+            );
+            expect(choices.filter((c) => c.selected).length).toBe(2);
+          },
+        });
       });
     });
 
@@ -208,7 +272,7 @@ describe("SelectProductOption", () => {
       });
     });
 
-    describe("Price adjustments based on option choices", () => {
+    describe("Price adjustments", () => {
       beforeEach(() => {
         products = productsWithOptionChoicesFixture();
         inventory = new InMemoryInventory(new ProductRepository(products));
@@ -234,6 +298,43 @@ describe("SelectProductOption", () => {
           id: CUSTOMIZABLE_PRODUCT_ID,
           totalPrice: (price: number) => {
             expect(price).toBe(expectedPrice);
+          },
+        });
+      });
+    });
+
+    describe("Constraints", () => {
+      it("should disable choices that are constrained by another option choice", () => {
+        const products = productsWithIncompatibleConstraintsFixture();
+        const inventory = new InMemoryInventory(
+          new ProductRepository(products)
+        );
+
+        const action = new SelectProductOption(inventory);
+
+        const actionResult = action.execute(
+          new SelectProductOptionCommand(
+            CUSTOMIZABLE_PRODUCT_ID,
+            [OPTION_1_ID],
+            [1]
+          )
+        );
+
+        expectSuccess(actionResult, {
+          id: CUSTOMIZABLE_PRODUCT_ID,
+          optionChoices: (choices: ProductOptionChoice[]) => {
+            expect(choices).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  id: CONSTRAINING_OPTION_CHOICE_ID,
+                  selected: true,
+                }),
+                expect.objectContaining({
+                  id: CONSTRAINED_OPTION_CHOICE_ID,
+                  disabled: true,
+                }),
+              ])
+            );
           },
         });
       });

@@ -29,6 +29,25 @@ export type ProductOptionChoice = {
   optionId: number;
   priceAdjustment: number;
   selected: boolean;
+  disabled: boolean;
+  constraints: Constraint[];
+};
+
+export type Constraint = Prettify<
+  {
+    id: number;
+    optionChoiceId: number;
+    constrainedBy: number;
+  } & (PriceConstraint | IncompatibleConstraint)
+>;
+
+export type PriceConstraint = {
+  type: "price";
+  priceAdjustment: number;
+};
+
+export type IncompatibleConstraint = {
+  type: "incompatible";
 };
 
 export class Product {
@@ -102,6 +121,25 @@ export class Product {
       }
 
       option.selected = true;
+
+      this._optionChoices
+        .flatMap((oc) => oc.constraints)
+        .filter(
+          (constraint) =>
+            constraint.constrainedBy === optionId &&
+            constraint.type === "incompatible"
+        )
+        .forEach((constraint) => {
+          const choice = this._optionChoices.find(
+            (oc) => oc.id === constraint.optionChoiceId
+          );
+
+          if (!choice) {
+            return;
+          }
+
+          choice.disabled = true;
+        });
 
       const choiceToSelect = this._optionChoices
         .filter((oc) => oc.optionId === optionId)
