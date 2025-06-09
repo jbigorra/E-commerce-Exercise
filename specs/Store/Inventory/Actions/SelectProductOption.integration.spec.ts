@@ -10,6 +10,10 @@ import {
 } from "../../../../src/Store/Inventory/Core/Entities";
 import { IInventory } from "../../../../src/Store/Inventory/Interfaces";
 import {
+  createCustomizableProduct,
+  createStandardProduct,
+} from "../../../Fixtures/Inventory";
+import {
   expectError,
   expectSuccess,
 } from "../../../Helpers/forActions/Matchers";
@@ -46,7 +50,7 @@ describe("SelectProductOption Integration Tests", () => {
 
   it("should reject customization of standard products", () => {
     // Arrange
-    const standardProduct = new Product(1, "standard", 100, [], []);
+    const standardProduct = createStandardProduct();
     inventory.addProduct(standardProduct);
     const command = new SelectProductOptionCommand(1, [1], []);
 
@@ -59,7 +63,11 @@ describe("SelectProductOption Integration Tests", () => {
 
   it("should require at least one option to be selected", () => {
     // Arrange
-    const customizableProduct = new Product(1, "customizable", 100, [], []);
+    const customizableProduct = createCustomizableProduct(
+      createCustomizableProduct({ id: 1 }),
+      [],
+      []
+    );
     inventory.addProduct(customizableProduct);
     const command = new SelectProductOptionCommand(1, [], []);
 
@@ -76,10 +84,8 @@ describe("SelectProductOption Integration Tests", () => {
   it("should handle invalid option IDs", () => {
     // Arrange
     const options: ProductOption[] = [{ id: 1, price: 10, selected: false }];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      { id: 1 },
       options,
       []
     );
@@ -99,10 +105,8 @@ describe("SelectProductOption Integration Tests", () => {
       { id: 1, price: 10, selected: false },
       { id: 2, price: 20, selected: false },
     ];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      { id: 1 },
       options,
       []
     );
@@ -115,8 +119,8 @@ describe("SelectProductOption Integration Tests", () => {
     // Assert
     expectSuccess(result);
     expect(result.result).toBe(customizableProduct);
-    expect(customizableProduct.options[0].selected).toBe(true);
-    expect(customizableProduct.options[1].selected).toBe(true);
+    expect(customizableProduct.options.findById(1)!.selected).toBe(true);
+    expect(customizableProduct.options.findById(2)!.selected).toBe(true);
   });
 
   it("should handle option choices correctly", () => {
@@ -132,10 +136,8 @@ describe("SelectProductOption Integration Tests", () => {
         constraints: [],
       },
     ];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      { id: 1 },
       options,
       optionChoices
     );
@@ -147,8 +149,8 @@ describe("SelectProductOption Integration Tests", () => {
 
     // Assert
     expectSuccess(result);
-    expect(customizableProduct.options[0].selected).toBe(true);
-    expect(customizableProduct.optionChoices[0].selected).toBe(true);
+    expect(customizableProduct.options.all[0].selected).toBe(true);
+    expect(customizableProduct.optionChoices.all[0].selected).toBe(true);
   });
 
   it("should reject multiple choices for same option", () => {
@@ -172,10 +174,8 @@ describe("SelectProductOption Integration Tests", () => {
         constraints: [],
       },
     ];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      { id: 1 },
       options,
       optionChoices
     );
@@ -218,10 +218,8 @@ describe("SelectProductOption Integration Tests", () => {
         constraints: constraints,
       },
     ];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      { id: 1 },
       options,
       optionChoices
     );
@@ -233,7 +231,7 @@ describe("SelectProductOption Integration Tests", () => {
 
     // Assert
     expectSuccess(result);
-    expect(customizableProduct.optionChoices[1].disabled).toBe(true);
+    expect(customizableProduct.optionChoices.all[1].disabled).toBe(true);
   });
 
   it("should calculate total price correctly", () => {
@@ -252,10 +250,11 @@ describe("SelectProductOption Integration Tests", () => {
         constraints: [],
       },
     ];
-    const customizableProduct = new Product(
-      1,
-      "customizable",
-      100,
+    const customizableProduct = createCustomizableProduct(
+      {
+        id: 1,
+        basePrice: 100,
+      },
       options,
       optionChoices
     );
