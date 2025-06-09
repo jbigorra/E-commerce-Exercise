@@ -1,4 +1,6 @@
 import { Product } from "../Core/Entities";
+import { ServiceFactory } from "../Core/Services/ServiceFactory";
+import { ChoiceId, OptionId, SelectedOptions } from "../Core/ValueObjects";
 import { IInventory } from "../Interfaces";
 import { ActionResult, Application } from "./Action";
 
@@ -11,6 +13,9 @@ export class SelectProductOptionCommand {
 }
 
 export class SelectProductOption {
+  private readonly customizationService =
+    ServiceFactory.createProductCustomizationService();
+
   constructor(private readonly inventory: IInventory) {}
 
   public execute(command: SelectProductOptionCommand): ActionResult<Product> {
@@ -18,12 +23,19 @@ export class SelectProductOption {
 
     if (!product) return Application.error(new Error("Product not found"));
 
-    const { error } = product.customizeWith(
-      command.optionIds,
-      command.optionChoicesIds
+    const selectedOptions = new SelectedOptions(
+      command.optionIds.map((id) => new OptionId(id)),
+      command.optionChoicesIds.map((id) => new ChoiceId(id))
     );
 
-    if (error) return Application.error(error);
+    const result = this.customizationService.customize(
+      product,
+      selectedOptions
+    );
+
+    if (result.isError()) {
+      return Application.error(result.getError());
+    }
 
     return Application.success(product);
   }

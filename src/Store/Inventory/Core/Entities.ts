@@ -93,69 +93,7 @@ export class Product {
     return this.type === "standard";
   }
 
-  public customizeWith(
-    optionIds: number[],
-    optionChoicesIds: number[]
-  ): { error: Error | undefined } {
-    if (this._isNotCustomizable()) {
-      return {
-        error: new Error("Product is not customizable"),
-      };
-    }
-
-    if (optionIds.length === 0) {
-      return {
-        error: new Error(
-          "At least one product option must be selected to customize the product"
-        ),
-      };
-    }
-
-    for (const optionId of optionIds) {
-      const option = this._options.find((o) => o.id === optionId);
-
-      if (!option) {
-        return {
-          error: new Error(`Product option with Id = ${optionId} not found`),
-        };
-      }
-
-      option.selected = true;
-
-      this._optionChoices
-        .flatMap((oc) => oc.constraints)
-        .filter(
-          (constraint) =>
-            constraint.constrainedBy === optionId &&
-            constraint.type === "incompatible"
-        )
-        .forEach((constraint) => {
-          const choice = this._optionChoices.find(
-            (oc) => oc.id === constraint.optionChoiceId
-          );
-
-          if (!choice) {
-            return;
-          }
-
-          choice.disabled = true;
-        });
-
-      const choiceToSelect = this._optionChoices
-        .filter((oc) => oc.optionId === optionId)
-        .filter((oc) => optionChoicesIds.includes(oc.id));
-
-      if (choiceToSelect.length === 0) {
-        continue;
-      }
-
-      if (choiceToSelect.length > 1) {
-        return { error: new Error("Only one option choice can be selected") };
-      }
-
-      choiceToSelect[0].selected = true;
-    }
-
-    return { error: undefined };
+  public isCustomizable(): boolean {
+    return !this._isNotCustomizable();
   }
 }
