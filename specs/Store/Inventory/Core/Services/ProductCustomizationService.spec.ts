@@ -16,6 +16,10 @@ import {
   OptionId,
   SelectedOptions,
 } from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import {
+  createCustomizableProduct,
+  createProductOptions,
+} from "../../../../Fixtures/Inventory";
 
 describe("ProductCustomizationService", () => {
   let service: ProductCustomizationService;
@@ -32,10 +36,7 @@ describe("ProductCustomizationService", () => {
       constraintEngine
     );
 
-    const options: ProductOption[] = [
-      { id: 1, price: 10, selected: false },
-      { id: 2, price: 20, selected: false },
-    ];
+    const options: ProductOption[] = createProductOptions();
     const optionChoices: ProductOptionChoice[] = [
       {
         id: 101,
@@ -54,7 +55,7 @@ describe("ProductCustomizationService", () => {
         constraints: [],
       },
     ];
-    product = new Product(1, "customizable", 100, options, optionChoices);
+    product = createCustomizableProduct({ id: 1 }, options, optionChoices);
   });
 
   describe("customize", () => {
@@ -100,46 +101,14 @@ describe("ProductCustomizationService", () => {
           type: "incompatible",
         },
       ];
-      product.optionChoices[1].constraints = constraints;
+      product.optionChoices.all[1].constraints = constraints;
 
       const selectedOptions = new SelectedOptions([new OptionId(1)], []);
 
       const result = service.customize(product, selectedOptions);
 
       expect(result.isSuccess()).toBe(true);
-      expect(product.optionChoices[1].disabled).toBe(true);
-    });
-  });
-
-  describe("reset", () => {
-    it("should reset all options and choices", () => {
-      // Set up product with selected options and choices
-      product.options[0].selected = true;
-      product.options[1].selected = true;
-      product.optionChoices[0].selected = true;
-      product.optionChoices[1].selected = true;
-      product.optionChoices[1].disabled = true;
-
-      const result = (service as DefaultProductCustomizationService).reset(
-        product
-      );
-
-      expect(result.isSuccess()).toBe(true);
-      expect(result.getValue()).toBe(product);
-      expect(product.options.every((o) => !o.selected)).toBe(true);
-      expect(product.optionChoices.every((c) => !c.selected)).toBe(true);
-      expect(product.optionChoices.every((c) => !c.disabled)).toBe(true);
-    });
-
-    it("should handle product with no options", () => {
-      const emptyProduct = new Product(1, "customizable", 100, [], []);
-
-      const result = (service as DefaultProductCustomizationService).reset(
-        emptyProduct
-      );
-
-      expect(result.isSuccess()).toBe(true);
-      expect(result.getValue()).toBe(emptyProduct);
+      expect(product.optionChoices.all[1].disabled).toBe(true);
     });
   });
 });

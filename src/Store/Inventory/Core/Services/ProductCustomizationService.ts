@@ -24,7 +24,7 @@ export class DefaultProductCustomizationService
       return Result.error(new Error("Product is not customizable"));
     }
 
-    if (options.optionIds.length === 0) {
+    if (options.hasOptions() === false) {
       return Result.error(
         new Error(
           "At least one product option must be selected to customize the product"
@@ -52,12 +52,15 @@ export class DefaultProductCustomizationService
     optionIds: OptionId[]
   ): Result<void> {
     for (const optionId of optionIds) {
-      const constraints = product.optionChoices
+      const constraints = product.optionChoices.all
         .flatMap((oc) => oc.constraints)
         .filter((constraint) => constraint.constrainedBy === optionId.value);
 
       if (constraints.length > 0) {
-        const context = new ConstraintContext(product.optionChoices, optionId);
+        const context = new ConstraintContext(
+          product.optionChoices.all,
+          optionId
+        );
         const result = this.constraintEngine.applyConstraints(
           constraints,
           context
@@ -68,22 +71,6 @@ export class DefaultProductCustomizationService
         }
       }
     }
-
-    return Result.success(undefined);
-  }
-
-  reset(product: Product): Result<Product> {
-    return this.optionSelectionService
-      .deselectAllOptions(product)
-      .flatMap(() => this.choiceSelectionService.deselectAllChoices(product))
-      .flatMap(() => this.resetConstraints(product))
-      .map(() => product);
-  }
-
-  private resetConstraints(product: Product): Result<void> {
-    product.optionChoices.forEach((choice) => {
-      choice.disabled = false;
-    });
 
     return Result.success(undefined);
   }
