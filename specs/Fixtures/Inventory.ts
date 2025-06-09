@@ -53,7 +53,7 @@ export const productsWithIncompatibleConstraintsFixture = (): Product[] => {
   return products;
 };
 
-const createStandardProduct = (obj: Partial<Product> = {}): Product => {
+export const createStandardProduct = (obj: Partial<Product> = {}): Product => {
   const defaults = {
     id: STANDARD_PRODUCT_ID,
     type: "standard" as const,
