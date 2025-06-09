@@ -8,6 +8,7 @@ import {
   ChoiceId,
   OptionId,
 } from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import { createCustomizableProduct } from "../../../../Fixtures/Inventory";
 
 describe("ChoiceSelectionService", () => {
   let service: ChoiceSelectionService;
@@ -45,7 +46,15 @@ describe("ChoiceSelectionService", () => {
         constraints: [],
       },
     ];
-    product = new Product(1, "customizable", 100, options, optionChoices);
+    product = createCustomizableProduct(
+      {
+        id: 1,
+        type: "customizable",
+        basePrice: 100,
+      },
+      options,
+      optionChoices
+    );
   });
 
   describe("selectChoices", () => {
@@ -56,7 +65,9 @@ describe("ChoiceSelectionService", () => {
       const result = service.selectChoices(product, optionIds, choiceIds);
 
       expect(result.isSuccess()).toBe(true);
-      expect(product.optionChoices[0].selected).toBe(true);
+      expect(
+        product.optionChoices.findByOptionId(new OptionId(1))?.selected
+      ).toBe(true);
     });
 
     it("should reject multiple choices for same option", () => {
@@ -72,7 +83,7 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should reject selecting disabled choice", () => {
-      product.optionChoices[0].disabled = true;
+      product.optionChoices.findByOptionId(new OptionId(1))!.disabled = true;
       const optionIds = [new OptionId(1)];
       const choiceIds = [new ChoiceId(101)];
 
@@ -91,66 +102,6 @@ describe("ChoiceSelectionService", () => {
       const result = service.selectChoices(product, optionIds, choiceIds);
 
       expect(result.isSuccess()).toBe(true);
-    });
-  });
-
-  describe("deselectAllChoices", () => {
-    it("should deselect all previously selected choices", () => {
-      product.optionChoices[0].selected = true;
-      product.optionChoices[1].selected = true;
-
-      const result = service.deselectAllChoices(product);
-
-      expect(result.isSuccess()).toBe(true);
-      expect(product.optionChoices.every((c) => !c.selected)).toBe(true);
-    });
-  });
-
-  describe("getSelectedChoices", () => {
-    it("should return selected choice IDs", () => {
-      product.optionChoices[0].selected = true;
-      product.optionChoices[2].selected = true;
-
-      const selectedChoices = service.getSelectedChoices(product);
-
-      expect(selectedChoices).toHaveLength(2);
-      expect(selectedChoices[0].value).toBe(101);
-      expect(selectedChoices[1].value).toBe(103);
-    });
-
-    it("should return empty array when no choices selected", () => {
-      const selectedChoices = service.getSelectedChoices(product);
-
-      expect(selectedChoices).toHaveLength(0);
-    });
-  });
-
-  describe("getChoicesForOption", () => {
-    it("should return choices for specific option", () => {
-      const choicesForOption1 = service.getChoicesForOption(
-        product,
-        new OptionId(1)
-      );
-      const choicesForOption2 = service.getChoicesForOption(
-        product,
-        new OptionId(2)
-      );
-
-      expect(choicesForOption1).toHaveLength(2);
-      expect(choicesForOption1[0].value).toBe(101);
-      expect(choicesForOption1[1].value).toBe(102);
-
-      expect(choicesForOption2).toHaveLength(1);
-      expect(choicesForOption2[0].value).toBe(103);
-    });
-
-    it("should return empty array for option with no choices", () => {
-      const choicesForOption = service.getChoicesForOption(
-        product,
-        new OptionId(999)
-      );
-
-      expect(choicesForOption).toHaveLength(0);
     });
   });
 });

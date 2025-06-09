@@ -2,6 +2,8 @@ import {
   Product,
   ProductOption,
   ProductOptionChoice,
+  ProductOptionChoices,
+  ProductOptions,
 } from "../../src/Store/Inventory/Core/Entities";
 
 export const NOT_FOUND_PRODUCT_ID = 100;
@@ -64,12 +66,12 @@ const createStandardProduct = (obj: Partial<Product> = {}): Product => {
     obj.id ?? defaults.id,
     obj.type ?? defaults.type,
     obj.basePrice ?? defaults.basePrice,
-    defaults.options,
-    defaults.optionChoices
+    new ProductOptions(defaults.options),
+    new ProductOptionChoices(defaults.optionChoices)
   );
 };
 
-const createCustomizableProduct = (
+export const createCustomizableProduct = (
   obj: Partial<Product> = {},
   options: ProductOption[] = [],
   optionChoices: ProductOptionChoice[] = []
@@ -84,12 +86,12 @@ const createCustomizableProduct = (
     obj.id ?? defaults.id,
     obj.type ?? defaults.type,
     obj.basePrice ?? defaults.basePrice,
-    options,
-    optionChoices
+    new ProductOptions(options),
+    new ProductOptionChoices(optionChoices)
   );
 };
 
-const createProductOptions = (): ProductOption[] => {
+export const createProductOptions = (): ProductOption[] => {
   const options = [
     {
       id: OPTION_1_ID,
@@ -111,7 +113,7 @@ const createProductOptions = (): ProductOption[] => {
   return options;
 };
 
-const createProductOptionChoices = (): ProductOptionChoice[] => {
+export const createProductOptionChoices = (): ProductOptionChoice[] => {
   const choices = [
     {
       id: 1,

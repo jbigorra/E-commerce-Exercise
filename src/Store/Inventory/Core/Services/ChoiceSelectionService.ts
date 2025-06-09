@@ -9,9 +9,8 @@ export class ChoiceSelectionService {
     choiceIds: ChoiceId[]
   ): Result<void> {
     for (const optionId of optionIds) {
-      const choicesToSelect = product.optionChoices
-        .filter((oc) => oc.optionId === optionId.value)
-        .filter((oc) => choiceIds.some((id) => id.value === oc.id));
+      const choicesToSelect =
+        product.optionChoices.findMatchingChoicesForOption(optionId, choiceIds);
 
       if (choicesToSelect.length > 1) {
         return Result.error(
@@ -35,25 +34,5 @@ export class ChoiceSelectionService {
     }
 
     return Result.success(undefined);
-  }
-
-  deselectAllChoices(product: Product): Result<void> {
-    product.optionChoices.forEach((choice) => {
-      choice.selected = false;
-    });
-
-    return Result.success(undefined);
-  }
-
-  getSelectedChoices(product: Product): ChoiceId[] {
-    return product.optionChoices
-      .filter((choice) => choice.selected)
-      .map((choice) => new ChoiceId(choice.id));
-  }
-
-  getChoicesForOption(product: Product, optionId: OptionId): ChoiceId[] {
-    return product.optionChoices
-      .filter((choice) => choice.optionId === optionId.value)
-      .map((choice) => new ChoiceId(choice.id));
   }
 }

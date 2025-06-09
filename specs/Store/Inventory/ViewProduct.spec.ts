@@ -2,7 +2,10 @@ import {
   ViewProduct,
   ViewProductCommand,
 } from "../../../src/Store/Inventory/Actions/ViewProduct";
-import { Product } from "../../../src/Store/Inventory/Core/Entities";
+import {
+  Product,
+  ProductOptions,
+} from "../../../src/Store/Inventory/Core/Entities";
 import {
   InMemoryInventory,
   ProductRepository,
@@ -47,7 +50,7 @@ describe("ViewProduct", () => {
       expectSuccess<Product>(actionResult, {
         id: STANDARD_PRODUCT_ID,
         type: "standard",
-        options: (opts: Product["options"]) => expect(opts).toEqual([]),
+        options: (opts: ProductOptions) => expect(opts.length).toEqual(0),
       });
     });
 
@@ -61,7 +64,7 @@ describe("ViewProduct", () => {
       expectSuccess<Product>(actionResult, {
         id: CUSTOMIZABLE_PRODUCT_ID,
         type: "customizable",
-        options: (opts: Product["options"]) =>
+        options: (opts: ProductOptions) =>
           expect(opts.length).toBeGreaterThanOrEqual(3),
       });
     });

@@ -1,3 +1,5 @@
+import { ChoiceId, OptionId } from "./ValueObjects";
+
 type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
@@ -50,42 +52,78 @@ export type IncompatibleConstraint = {
   type: "incompatible";
 };
 
+export class ProductOptions {
+  constructor(private readonly options: ProductOption[]) {}
+  public get length(): number {
+    return this.options.length;
+  }
+
+  public selectedTotalPrice(): number {
+    return this.options
+      .filter((o) => o.selected)
+      .reduce((acc, o) => acc + o.price, 0);
+  }
+
+  public findById(id: number): ProductOption | undefined {
+    return this.options.find((o) => o.id === id);
+  }
+}
+
+export class ProductOptionChoices {
+  constructor(private readonly _list: ProductOptionChoice[]) {}
+
+  public get all(): ProductOptionChoice[] {
+    return this._list;
+  }
+
+  public findMatchingChoicesForOption(
+    optionId: OptionId,
+    choiceIds: ChoiceId[]
+  ): ProductOptionChoice[] {
+    return this._list
+      .filter((oc) => oc.optionId === optionId.value)
+      .filter((oc) => choiceIds.some((id) => id.value === oc.id));
+  }
+
+  public findByOptionId(optionId: OptionId): ProductOptionChoice | undefined {
+    return this._list.find((oc) => oc.optionId === optionId.value);
+  }
+
+  public selectedChoicesTotalPriceAdjustment(): number {
+    return this._list
+      .filter((oc) => oc.selected)
+      .reduce((acc, oc) => acc + oc.priceAdjustment, 0);
+  }
+}
+
 export class Product {
-  private _options: ProductOption[];
-  private _optionChoices: ProductOptionChoice[];
+  private _options: ProductOptions;
+  private _optionChoices: ProductOptionChoices;
 
   constructor(
     readonly id: number,
     readonly type: ProductType,
     readonly basePrice: number,
-    options: ProductOption[],
-    optionChoices: ProductOptionChoice[]
+    options: ProductOptions,
+    optionChoices: ProductOptionChoices
   ) {
     this._options = options;
     this._optionChoices = optionChoices;
   }
 
   public get totalPrice(): number {
-    const selectedOptionsTotalPrice = this._options
-      .filter((o) => o.selected)
-      .reduce((acc, o) => acc + o.price, 0);
-
-    const selectedOptionChoicesTotalPrice = this._optionChoices
-      .filter((oc) => oc.selected)
-      .reduce((acc, oc) => acc + oc.priceAdjustment, 0);
-
     return (
       this.basePrice +
-      selectedOptionsTotalPrice +
-      selectedOptionChoicesTotalPrice
+      this._options.selectedTotalPrice() +
+      this._optionChoices.selectedChoicesTotalPriceAdjustment()
     );
   }
 
-  public get options(): ProductOption[] {
+  public get options(): ProductOptions {
     return this._options;
   }
 
-  public get optionChoices(): ProductOptionChoice[] {
+  public get optionChoices(): ProductOptionChoices {
     return this._optionChoices;
   }
 
