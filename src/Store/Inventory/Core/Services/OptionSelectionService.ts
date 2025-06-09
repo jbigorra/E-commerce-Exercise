@@ -5,7 +5,7 @@ import { OptionId } from "../ValueObjects";
 export class OptionSelectionService {
   selectOptions(product: Product, optionIds: OptionId[]): Result<void> {
     for (const optionId of optionIds) {
-      const option = product.options.find((o) => o.id === optionId.value);
+      const option = product.options.findById(optionId.value);
 
       if (!option) {
         return Result.error(
@@ -17,19 +17,5 @@ export class OptionSelectionService {
     }
 
     return Result.success(undefined);
-  }
-
-  deselectAllOptions(product: Product): Result<void> {
-    product.options.forEach((option) => {
-      option.selected = false;
-    });
-
-    return Result.success(undefined);
-  }
-
-  getSelectedOptions(product: Product): OptionId[] {
-    return product.options
-      .filter((option) => option.selected)
-      .map((option) => new OptionId(option.id));
   }
 }

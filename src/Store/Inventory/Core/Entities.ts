@@ -1,5 +1,3 @@
-import { ChoiceId, OptionId } from "./ValueObjects";
-
 type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
@@ -53,19 +51,24 @@ export type IncompatibleConstraint = {
 };
 
 export class ProductOptions {
-  constructor(private readonly options: ProductOption[]) {}
+  constructor(private readonly _list: ProductOption[]) {}
+
   public get length(): number {
-    return this.options.length;
+    return this._list.length;
+  }
+
+  public get all(): ProductOption[] {
+    return this._list;
   }
 
   public selectedTotalPrice(): number {
-    return this.options
+    return this._list
       .filter((o) => o.selected)
       .reduce((acc, o) => acc + o.price, 0);
   }
 
   public findById(id: number): ProductOption | undefined {
-    return this.options.find((o) => o.id === id);
+    return this._list.find((o) => o.id === id);
   }
 }
 
@@ -77,16 +80,16 @@ export class ProductOptionChoices {
   }
 
   public findMatchingChoicesForOption(
-    optionId: OptionId,
-    choiceIds: ChoiceId[]
+    optionId: number,
+    choiceIds: number[]
   ): ProductOptionChoice[] {
     return this._list
-      .filter((oc) => oc.optionId === optionId.value)
-      .filter((oc) => choiceIds.some((id) => id.value === oc.id));
+      .filter((oc) => oc.optionId === optionId)
+      .filter((oc) => choiceIds.some((id) => id === oc.id));
   }
 
-  public findByOptionId(optionId: OptionId): ProductOptionChoice | undefined {
-    return this._list.find((oc) => oc.optionId === optionId.value);
+  public findByOptionId(optionId: number): ProductOptionChoice | undefined {
+    return this._list.find((oc) => oc.optionId === optionId);
   }
 
   public selectedChoicesTotalPriceAdjustment(): number {

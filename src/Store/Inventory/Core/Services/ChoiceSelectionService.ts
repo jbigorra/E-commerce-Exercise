@@ -10,7 +10,10 @@ export class ChoiceSelectionService {
   ): Result<void> {
     for (const optionId of optionIds) {
       const choicesToSelect =
-        product.optionChoices.findMatchingChoicesForOption(optionId, choiceIds);
+        product.optionChoices.findMatchingChoicesForOption(
+          optionId.value,
+          choiceIds.map((c) => c.value)
+        );
 
       if (choicesToSelect.length > 1) {
         return Result.error(
