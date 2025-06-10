@@ -1,5 +1,4 @@
 import { SelectProductOptionCommand } from "../../../../../src/Store/Inventory/Actions/SelectProductOption";
-import { ProductOptionChoices } from "../../../../../src/Store/Inventory/Core/Entities";
 import {
   CONSTRAINED_OPTION_CHOICE_ID,
   CONSTRAINING_OPTION_CHOICE_ID,
@@ -15,21 +14,38 @@ import {
   productsWithPriceConstraintsFixture,
 } from "../../../../Fixtures/Inventory";
 import { expectSuccess } from "../../../../Helpers/forActions/Matchers";
+import {
+  expectConstraintEffect,
+  expectProductState,
+  expectTotalPrice,
+} from "./shared/custom-matchers";
 import { createSelectAction, createTestInventory } from "./shared/test-setup";
 
-describe("SelectProductOption - Constraint Scenarios", () => {
-  /*
-   * Tests verify product constraint system behavior:
-   * - Incompatible constraints disable conflicting choices
-   * - Price constraints modify total pricing
-   * - Mixed constraints handle multiple constraint types
+describe("SelectProductOption - Product Constraint System", () => {
+  /**
+   * Test Suite: Product Constraint System Verification
+   *
+   * This suite validates the constraint engine's ability to:
+   * - Enforce incompatible choice restrictions (e.g., certain components cannot be combined)
+   * - Apply price adjustments based on component compatibility
+   * - Handle complex scenarios with multiple constraint types simultaneously
+   *
+   * Business Context: In product customization, certain combinations are invalid due to
+   * manufacturing limitations, design conflicts, or business rules.
    */
 
-  it("should disable choices that are constrained by another option choice", () => {
+  /**
+   * Verifies incompatible constraint behavior.
+   * Business Rule: When one choice is selected, it can disable other conflicting choices
+   * to prevent invalid product configurations.
+   */
+  it("should disable conflicting choices when incompatible constraint is triggered", () => {
+    // Arrange
     const products = productsWithIncompatibleConstraintsFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
+    // Act - Select a choice that should trigger constraint effects
     const actionResult = action.execute(
       new SelectProductOptionCommand(
         CUSTOMIZABLE_PRODUCT_ID,
@@ -38,30 +54,26 @@ describe("SelectProductOption - Constraint Scenarios", () => {
       )
     );
 
-    expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      optionChoices: (choices: ProductOptionChoices) => {
-        expect(choices.all).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: CONSTRAINING_OPTION_CHOICE_ID,
-              selected: true,
-            }),
-            expect.objectContaining({
-              id: CONSTRAINED_OPTION_CHOICE_ID,
-              disabled: true,
-            }),
-          ])
-        );
-      },
-    });
+    // Assert - Verify constraint was applied correctly using enhanced matchers
+    expectSuccess(actionResult);
+    expectConstraintEffect(
+      actionResult.result!,
+      [CONSTRAINING_OPTION_CHOICE_ID], // should be selected
+      [CONSTRAINED_OPTION_CHOICE_ID] // should be disabled
+    );
   });
 
-  it("should apply price constraints correctly", () => {
+  /**
+   * Verifies price constraint functionality.
+   * Business Rule: Certain choices may have conditional pricing based on other selections.
+   */
+  it("should calculate total price correctly when price constraints are applied", () => {
+    // Arrange
     const products = productsWithPriceConstraintsFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
+    // Act - Select a choice with price constraints
     const actionResult = action.execute(
       new SelectProductOptionCommand(
         CUSTOMIZABLE_PRODUCT_ID,
@@ -70,23 +82,26 @@ describe("SelectProductOption - Constraint Scenarios", () => {
       )
     );
 
-    // From fixture: basePrice(20) + option1Price(10) + choicePrice(5) = 35
-    // Price constraints don't actually modify the price in current implementation
+    // Assert - Verify price calculation includes constraint effects
+    // Price calculation: basePrice(20) + option1Price(10) + choicePrice(5) = 35
     const expectedPrice = 35;
 
-    expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      totalPrice: (price: number) => {
-        expect(price).toBe(expectedPrice);
-      },
-    });
+    expectSuccess(actionResult);
+    expectTotalPrice(actionResult.result!, expectedPrice);
   });
 
-  it("should handle products with both price and incompatible constraints", () => {
+  /**
+   * Verifies complex scenario handling with multiple constraint types.
+   * Business Rule: Products can have both pricing and compatibility constraints
+   * that must all be evaluated correctly in combination.
+   */
+  it("should handle complex scenarios with both price and incompatible constraints simultaneously", () => {
+    // Arrange
     const products = productsWithMixedConstraintsFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
+    // Act - Select choices that trigger multiple constraint types
     const actionResult = action.execute(
       new SelectProductOptionCommand(
         CUSTOMIZABLE_PRODUCT_ID,
@@ -95,33 +110,13 @@ describe("SelectProductOption - Constraint Scenarios", () => {
       )
     );
 
-    // From fixture: basePrice(20) + option1Price(10) + option2Price(20) + choice1Price(5) + choice2Price(8) = 63
-    // Price constraints don't actually modify the price in current implementation
-    const expectedPrice = 63;
-
-    expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
-      optionChoices: (choices: ProductOptionChoices) => {
-        expect(choices.all).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: MIXED_CONSTRAINT_CHOICE_1,
-              selected: true,
-            }),
-            expect.objectContaining({
-              id: MIXED_CONSTRAINT_CHOICE_2,
-              selected: true,
-            }),
-            expect.objectContaining({
-              id: INCOMPATIBLE_CONSTRAINED_CHOICE,
-              disabled: true,
-            }),
-          ])
-        );
-      },
-      totalPrice: (price: number) => {
-        expect(price).toBe(expectedPrice);
-      },
+    // Assert - Verify both constraint types are applied correctly using comprehensive matcher
+    // Price calculation: basePrice(20) + option1Price(10) + option2Price(20) + choice1Price(5) + choice2Price(8) = 63
+    expectSuccess(actionResult);
+    expectProductState(actionResult.result!, {
+      selectedChoices: [MIXED_CONSTRAINT_CHOICE_1, MIXED_CONSTRAINT_CHOICE_2],
+      disabledChoices: [INCOMPATIBLE_CONSTRAINED_CHOICE],
+      totalPrice: 63,
     });
   });
 });

@@ -23,6 +23,19 @@ import {
 import { createSelectAction, createTestInventory } from "./shared/test-setup";
 
 describe("SelectProductOption - Error Scenarios", () => {
+  /**
+   * Test Suite: Error Handling Validation
+   *
+   * This suite verifies that the SelectProductOption action properly handles
+   * invalid inputs and edge cases by returning appropriate error messages.
+   *
+   * Error categories tested:
+   * - Product not found
+   * - Invalid product types
+   * - Missing or invalid options
+   * - Constraint violations
+   */
+
   let products: Product[];
   let inventory: IInventory;
 
@@ -31,121 +44,175 @@ describe("SelectProductOption - Error Scenarios", () => {
     inventory = createTestInventory(products);
   });
 
-  it("Should return error when product is not found", () => {
+  /**
+   * Verifies error handling when product doesn't exist in inventory.
+   */
+  it("should return error when product is not found", () => {
+    // Arrange
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(NOT_FOUND_PRODUCT_ID, [OPTION_1_ID], [])
+    const command = new SelectProductOptionCommand(
+      NOT_FOUND_PRODUCT_ID,
+      [OPTION_1_ID],
+      []
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(actionResult, "Product not found");
   });
 
-  it("Should return error when selecting an option on a standard product", () => {
+  /**
+   * Verifies error handling when attempting to customize non-customizable products.
+   */
+  it("should return error when selecting an option on a standard product", () => {
+    // Arrange
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(STANDARD_PRODUCT_ID, [OPTION_1_ID], [])
+    const command = new SelectProductOptionCommand(
+      STANDARD_PRODUCT_ID,
+      [OPTION_1_ID],
+      []
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(actionResult, "Product is not customizable");
   });
 
-  it("Should return error when selecting unavailable options", () => {
+  /**
+   * Verifies error handling when selecting options that don't exist on the product.
+   */
+  it("should return error when selecting unavailable options", () => {
+    // Arrange
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [UNAVAILABLE_OPTION_ID],
-        []
-      )
+    const command = new SelectProductOptionCommand(
+      CUSTOMIZABLE_PRODUCT_ID,
+      [UNAVAILABLE_OPTION_ID],
+      []
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(
       actionResult,
       `Product option with Id = ${UNAVAILABLE_OPTION_ID} not found`
     );
   });
 
-  it("Should return error when no options are selected", () => {
+  /**
+   * Verifies error handling when no options are provided for customization.
+   */
+  it("should return error when no options are selected", () => {
+    // Arrange
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(CUSTOMIZABLE_PRODUCT_ID, [], [])
+    const command = new SelectProductOptionCommand(
+      CUSTOMIZABLE_PRODUCT_ID,
+      [],
+      []
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(
       actionResult,
       "At least one product option must be selected to customize the product"
     );
   });
 
-  it("Should return error when selecting more than one option choice for the same option", () => {
+  /**
+   * Verifies error handling when multiple choices are selected for the same option.
+   */
+  it("should return error when selecting more than one option choice for the same option", () => {
+    // Arrange
     const products = productsWithOptionChoicesFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID],
-        [1, 2]
-      )
+    const command = new SelectProductOptionCommand(
+      CUSTOMIZABLE_PRODUCT_ID,
+      [OPTION_1_ID],
+      [1, 2] // Multiple choices for same option
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(actionResult, "Only one option choice can be selected");
   });
 
-  it("Should return error when selecting a disabled choice", () => {
+  /**
+   * Verifies error handling when attempting to select disabled choices.
+   * Business Rule: Disabled choices cannot be selected due to constraint violations.
+   */
+  it("should return error when selecting a disabled choice", () => {
+    // Arrange
     const products = productsWithIncompatibleConstraintsFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
-
     // Try to select both the constraining option and the constrained choice at the same time
     // This will trigger the constraint and disable the choice, then fail when trying to select it
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID, OPTION_3_ID],
-        [CONSTRAINING_OPTION_CHOICE_ID, CONSTRAINED_OPTION_CHOICE_ID]
-      )
+    const command = new SelectProductOptionCommand(
+      CUSTOMIZABLE_PRODUCT_ID,
+      [OPTION_1_ID, OPTION_3_ID],
+      [CONSTRAINING_OPTION_CHOICE_ID, CONSTRAINED_OPTION_CHOICE_ID]
     );
 
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert
     expectError(
       actionResult,
       `Choice with Id = ${CONSTRAINED_OPTION_CHOICE_ID} is disabled and cannot be selected`
     );
   });
 
-  it("Should handle non-existent choice IDs gracefully", () => {
+  /**
+   * Verifies graceful handling of non-existent choice IDs.
+   * Business Rule: Invalid choice IDs should be ignored rather than causing errors.
+   */
+  it("should handle non-existent choice IDs gracefully", () => {
+    // Arrange
     const products = productsWithOptionChoicesFixture();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
-
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID],
-        [99999] // Non-existent choice ID
-      )
+    const command = new SelectProductOptionCommand(
+      CUSTOMIZABLE_PRODUCT_ID,
+      [OPTION_1_ID],
+      [99999] // Non-existent choice ID
     );
 
-    // Should succeed and ignore invalid choice IDs (verify current behavior)
+    // Act
+    const actionResult = action.execute(command);
+
+    // Assert - Should succeed and ignore invalid choice IDs (verify current behavior)
     expectSuccess(actionResult);
   });
 
-  // Example of new builder-based test - showing the future approach
-  it("Should demonstrate new builder pattern for basic error case", () => {
+  /**
+   * Demonstrates new builder pattern for creating focused test scenarios.
+   * This shows the future direction for test data creation.
+   */
+  it("should demonstrate new builder pattern for basic error case", () => {
     // Arrange - explicit data creation using builders
     const products = BasicProductScenarios.productsCollection();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
+    const command = new SelectProductOptionCommand(
+      ProductIds.STANDARD_PRODUCT,
+      [1],
+      []
+    );
 
     // Act
-    const actionResult = action.execute(
-      new SelectProductOptionCommand(ProductIds.STANDARD_PRODUCT, [1], [])
-    );
+    const actionResult = action.execute(command);
 
     // Assert
     expectError(actionResult, "Product is not customizable");

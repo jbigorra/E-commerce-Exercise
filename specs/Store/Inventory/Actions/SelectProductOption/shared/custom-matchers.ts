@@ -1,3 +1,4 @@
+import { expect } from "@jest/globals";
 import { ActionResult } from "../../../../../../src/Store/Inventory/Actions/Action";
 import {
   Product,
@@ -28,7 +29,7 @@ export function expectProductSuccess(
 }
 
 /**
- * Verify specific options are selected
+ * Verify specific options are selected with clear business context
  */
 export function expectSelectedOptions(
   product: Product,
@@ -41,7 +42,7 @@ export function expectSelectedOptions(
 }
 
 /**
- * Verify specific choices are disabled
+ * Verify specific choices are disabled due to constraints
  */
 export function expectDisabledChoices(
   product: Product,
@@ -53,8 +54,64 @@ export function expectDisabledChoices(
 }
 
 /**
- * Verify exact total price
+ * Verify specific choices are selected
+ */
+export function expectSelectedChoices(
+  product: Product,
+  expectedChoiceIds: number[]
+) {
+  const selectedChoices = product.optionChoices.all.filter((c) => c.selected);
+  const selectedIds = selectedChoices.map((c) => c.id);
+  expect(selectedIds).toEqual(expect.arrayContaining(expectedChoiceIds));
+  expect(selectedIds).toHaveLength(expectedChoiceIds.length);
+}
+
+/**
+ * Verify exact total price with business context
  */
 export function expectTotalPrice(product: Product, expectedPrice: number) {
   expect(product.totalPrice).toBe(expectedPrice);
+}
+
+/**
+ * Verify constraint behavior - that selecting certain options disables specific choices
+ */
+export function expectConstraintEffect(
+  product: Product,
+  expectedSelectedChoices: number[],
+  expectedDisabledChoices: number[]
+) {
+  expectSelectedChoices(product, expectedSelectedChoices);
+  expectDisabledChoices(product, expectedDisabledChoices);
+}
+
+/**
+ * Comprehensive product state verification
+ */
+export interface ProductStateExpectation {
+  selectedOptions?: number[];
+  selectedChoices?: number[];
+  disabledChoices?: number[];
+  totalPrice?: number;
+}
+
+export function expectProductState(
+  product: Product,
+  expectation: ProductStateExpectation
+) {
+  if (expectation.selectedOptions) {
+    expectSelectedOptions(product, expectation.selectedOptions);
+  }
+
+  if (expectation.selectedChoices) {
+    expectSelectedChoices(product, expectation.selectedChoices);
+  }
+
+  if (expectation.disabledChoices) {
+    expectDisabledChoices(product, expectation.disabledChoices);
+  }
+
+  if (expectation.totalPrice !== undefined) {
+    expectTotalPrice(product, expectation.totalPrice);
+  }
 }
