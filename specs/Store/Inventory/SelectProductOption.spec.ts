@@ -4,8 +4,8 @@ import {
 } from "../../../src/Store/Inventory/Actions/SelectProductOption";
 import {
   Product,
-  ProductOption,
-  ProductOptionChoice,
+  ProductOptionChoices,
+  ProductOptions,
 } from "../../../src/Store/Inventory/Core/Entities";
 import {
   InMemoryInventory,
@@ -130,8 +130,8 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          options: (opts: ProductOption[]) => {
-            expect(opts).toEqual(
+          options: (opts: ProductOptions) => {
+            expect(opts.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({ id: OPTION_1_ID, selected: true }),
                 expect.objectContaining({ id: OPTION_2_ID, selected: false }),
@@ -155,8 +155,8 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          options: (opts: ProductOption[]) => {
-            expect(opts).toEqual(
+          options: (opts: ProductOptions) => {
+            expect(opts.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({ id: OPTION_1_ID, selected: true }),
                 expect.objectContaining({ id: OPTION_2_ID, selected: true }),
@@ -180,8 +180,8 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          options: (opts: ProductOption[]) => {
-            expect(opts).toEqual(
+          options: (opts: ProductOptions) => {
+            expect(opts.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({ id: OPTION_1_ID, selected: true }),
                 expect.objectContaining({ id: OPTION_2_ID, selected: true }),
@@ -210,13 +210,13 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          optionChoices: (choices: ProductOptionChoice[]) => {
-            expect(choices).toEqual(
+          optionChoices: (choices: ProductOptionChoices) => {
+            expect(choices.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({ id: 1, selected: true }),
               ])
             );
-            expect(choices.filter((c) => c.selected).length).toBe(1);
+            expect(choices.all.filter((c) => c.selected).length).toBe(1);
           },
         });
       });
@@ -238,14 +238,14 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          optionChoices: (choices: ProductOptionChoice[]) => {
-            expect(choices).toEqual(
+          optionChoices: (choices: ProductOptionChoices) => {
+            expect(choices.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({ id: 1, selected: true }),
                 expect.objectContaining({ id: 3, selected: true }),
               ])
             );
-            expect(choices.filter((c) => c.selected).length).toBe(2);
+            expect(choices.all.filter((c) => c.selected).length).toBe(2);
           },
         });
       });
@@ -322,8 +322,8 @@ describe("SelectProductOption", () => {
 
         expectSuccess(actionResult, {
           id: CUSTOMIZABLE_PRODUCT_ID,
-          optionChoices: (choices: ProductOptionChoice[]) => {
-            expect(choices).toEqual(
+          optionChoices: (choices: ProductOptionChoices) => {
+            expect(choices.all).toEqual(
               expect.arrayContaining([
                 expect.objectContaining({
                   id: CONSTRAINING_OPTION_CHOICE_ID,
