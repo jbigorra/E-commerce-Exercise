@@ -1,6 +1,7 @@
 import { SelectProductOptionCommand } from "../../../../../src/Store/Inventory/Actions/SelectProductOption";
 import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
 import { IInventory } from "../../../../../src/Store/Inventory/Interfaces";
+import { ProductIds } from "../../../../Fixtures/constants/ProductConstants";
 import {
   CONSTRAINED_OPTION_CHOICE_ID,
   CONSTRAINING_OPTION_CHOICE_ID,
@@ -14,6 +15,7 @@ import {
   STANDARD_PRODUCT_ID,
   UNAVAILABLE_OPTION_ID,
 } from "../../../../Fixtures/Inventory";
+import { BasicProductScenarios } from "../../../../Fixtures/scenarios/BasicProductScenarios";
 import {
   expectError,
   expectSuccess,
@@ -131,5 +133,21 @@ describe("SelectProductOption - Error Scenarios", () => {
 
     // Should succeed and ignore invalid choice IDs (verify current behavior)
     expectSuccess(actionResult);
+  });
+
+  // Example of new builder-based test - showing the future approach
+  it("Should demonstrate new builder pattern for basic error case", () => {
+    // Arrange - explicit data creation using builders
+    const products = BasicProductScenarios.productsCollection();
+    const inventory = createTestInventory(products);
+    const action = createSelectAction(inventory);
+
+    // Act
+    const actionResult = action.execute(
+      new SelectProductOptionCommand(ProductIds.STANDARD_PRODUCT, [1], [])
+    );
+
+    // Assert
+    expectError(actionResult, "Product is not customizable");
   });
 });
