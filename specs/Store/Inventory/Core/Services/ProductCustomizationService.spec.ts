@@ -19,6 +19,7 @@ import {
 import {
   createCustomizableProduct,
   createProductOptions,
+  createStandardProduct,
 } from "../../../../Fixtures/Inventory";
 
 describe("ProductCustomizationService", () => {
@@ -60,7 +61,7 @@ describe("ProductCustomizationService", () => {
 
   describe("customize", () => {
     it("should reject standard products", () => {
-      const standardProduct = new Product(1, "standard", 100, [], []);
+      const standardProduct = createStandardProduct();
       const selectedOptions = new SelectedOptions([new OptionId(1)], []);
 
       const result = service.customize(standardProduct, selectedOptions);
