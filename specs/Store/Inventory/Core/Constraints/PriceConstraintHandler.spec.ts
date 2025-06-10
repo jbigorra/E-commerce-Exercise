@@ -67,7 +67,7 @@ describe("PriceConstraintHandler", () => {
         type: "incompatible",
       };
 
-      const result = handler.handle(incompatibleConstraint, context);
+      const result = handler.apply(incompatibleConstraint, context);
 
       expect(result.isError()).toBe(true);
       expect(result.getError().message).toBe(
@@ -84,7 +84,7 @@ describe("PriceConstraintHandler", () => {
         priceAdjustment: 5,
       };
 
-      const result = handler.handle(priceConstraint, context);
+      const result = handler.apply(priceConstraint, context);
 
       expect(result.isSuccess()).toBe(true);
     });
@@ -98,7 +98,7 @@ describe("PriceConstraintHandler", () => {
         priceAdjustment: 5,
       };
 
-      const result = handler.handle(priceConstraint, context);
+      const result = handler.apply(priceConstraint, context);
 
       expect(result.isSuccess()).toBe(true);
     });
@@ -112,7 +112,7 @@ describe("PriceConstraintHandler", () => {
         priceAdjustment: 5,
       };
 
-      const result = handler.handle(priceConstraint, context);
+      const result = handler.apply(priceConstraint, context);
 
       expect(result.isSuccess()).toBe(true);
     });

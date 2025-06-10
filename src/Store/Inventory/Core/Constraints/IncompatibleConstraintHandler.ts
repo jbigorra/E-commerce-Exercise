@@ -1,14 +1,14 @@
 import { Constraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
-import { ConstraintHandler } from "./ConstraintHandler";
+import { ConstraintStrategy } from "./Interfaces";
 
-export class IncompatibleConstraintHandler implements ConstraintHandler {
+export class IncompatibleConstraintHandler implements ConstraintStrategy {
   canHandle(constraint: Constraint): boolean {
     return constraint.type === "incompatible";
   }
 
-  handle(constraint: Constraint, context: ConstraintContext): Result<void> {
+  apply(constraint: Constraint, context: ConstraintContext): Result<void> {
     if (!this.canHandle(constraint)) {
       return Result.error(
         new Error("Cannot handle non-incompatible constraint")

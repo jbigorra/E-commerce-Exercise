@@ -2,7 +2,7 @@ import { Constraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
 
-export interface ConstraintHandler {
+export interface ConstraintStrategy {
   canHandle(constraint: Constraint): boolean;
-  handle(constraint: Constraint, context: ConstraintContext): Result<void>;
+  apply(constraint: Constraint, context: ConstraintContext): Result<void>;
 }
