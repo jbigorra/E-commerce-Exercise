@@ -65,9 +65,7 @@ describe("ChoiceSelectionService", () => {
       const result = service.selectChoices(product, optionIds, choiceIds);
 
       expect(result.isSuccess()).toBe(true);
-      expect(
-        product.optionChoices.findByOptionId(new OptionId(1))?.selected
-      ).toBe(true);
+      expect(product.optionChoices.all[0].selected).toBe(true);
     });
 
     it("should reject multiple choices for same option", () => {
@@ -83,7 +81,7 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should reject selecting disabled choice", () => {
-      product.optionChoices.findByOptionId(new OptionId(1))!.disabled = true;
+      product.optionChoices.all[0].disabled = true;
       const optionIds = [new OptionId(1)];
       const choiceIds = [new ChoiceId(101)];
 
