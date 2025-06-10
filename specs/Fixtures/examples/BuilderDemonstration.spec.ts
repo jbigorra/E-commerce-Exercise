@@ -121,8 +121,8 @@ describe("Builder Pattern Demonstration", () => {
 
     // Assert
     expectSuccess(result);
-    const redRimChoice = result.result!.optionChoices.all.find(
-      (c) => c.id === ChoiceIds.RED_RIM
+    const redRimChoice = result.result!.optionChoices.findById(
+      ChoiceIds.RED_RIM
     );
     expect(redRimChoice?.disabled).toBe(true);
   });

@@ -79,6 +79,10 @@ export class ProductOptionChoices {
     return this._list;
   }
 
+  public findById(choiceId: number): ProductOptionChoice | undefined {
+    return this._list.find((c) => c.id === choiceId);
+  }
+
   public findMatchingChoicesForOption(
     optionId: number,
     choiceIds: number[]
@@ -88,8 +92,8 @@ export class ProductOptionChoices {
       .filter((oc) => choiceIds.some((id) => id === oc.id));
   }
 
-  public findByOptionId(optionId: number): ProductOptionChoice | undefined {
-    return this._list.find((oc) => oc.optionId === optionId);
+  public findByOptionId(optionId: number): ProductOptionChoice[] {
+    return this._list.filter((oc) => oc.optionId === optionId);
   }
 
   public selectedChoicesTotalPriceAdjustment(): number {

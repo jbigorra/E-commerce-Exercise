@@ -1,21 +1,17 @@
 import { SelectProductOptionCommand } from "../../../../../src/Store/Inventory/Actions/SelectProductOption";
 import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
 import { IInventory } from "../../../../../src/Store/Inventory/Interfaces";
-import { ProductIds } from "../../../../Fixtures/constants/ProductConstants";
+import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
+import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";
+import { ProductOptionChoiceBuilder } from "../../../../Fixtures/builders/ProductOptionChoiceBuilder";
 import {
-  CONSTRAINED_OPTION_CHOICE_ID,
-  CONSTRAINING_OPTION_CHOICE_ID,
-  CUSTOMIZABLE_PRODUCT_ID,
-  NOT_FOUND_PRODUCT_ID,
-  OPTION_1_ID,
-  OPTION_3_ID,
-  productsFixture,
-  productsWithIncompatibleConstraintsFixture,
-  productsWithOptionChoicesFixture,
-  STANDARD_PRODUCT_ID,
-  UNAVAILABLE_OPTION_ID,
-} from "../../../../Fixtures/Inventory";
+  ChoiceIds,
+  OptionIds,
+  ProductIds,
+  TestScenarios,
+} from "../../../../Fixtures/constants/ProductConstants";
 import { BasicProductScenarios } from "../../../../Fixtures/scenarios/BasicProductScenarios";
+import { IncompatibleConstraintScenarios } from "../../../../Fixtures/scenarios/IncompatibleConstraintScenarios";
 import {
   expectError,
   expectSuccess,
@@ -40,7 +36,7 @@ describe("SelectProductOption - Error Scenarios", () => {
   let inventory: IInventory;
 
   beforeEach(() => {
-    products = productsFixture();
+    products = BasicProductScenarios.productsCollection();
     inventory = createTestInventory(products);
   });
 
@@ -51,8 +47,8 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Arrange
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      NOT_FOUND_PRODUCT_ID,
-      [OPTION_1_ID],
+      TestScenarios.NOT_FOUND_PRODUCT,
+      [OptionIds.FRAME_TYPE],
       []
     );
 
@@ -70,8 +66,8 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Arrange
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      STANDARD_PRODUCT_ID,
-      [OPTION_1_ID],
+      ProductIds.STANDARD_PRODUCT,
+      [OptionIds.FRAME_TYPE],
       []
     );
 
@@ -89,8 +85,8 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Arrange
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      CUSTOMIZABLE_PRODUCT_ID,
-      [UNAVAILABLE_OPTION_ID],
+      ProductIds.CUSTOMIZABLE_PRODUCT,
+      [TestScenarios.UNAVAILABLE_OPTION],
       []
     );
 
@@ -100,7 +96,7 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Assert
     expectError(
       actionResult,
-      `Product option with Id = ${UNAVAILABLE_OPTION_ID} not found`
+      `Product option with Id = ${TestScenarios.UNAVAILABLE_OPTION} not found`
     );
   });
 
@@ -111,7 +107,7 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Arrange
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      CUSTOMIZABLE_PRODUCT_ID,
+      ProductIds.CUSTOMIZABLE_PRODUCT,
       [],
       []
     );
@@ -130,14 +126,38 @@ describe("SelectProductOption - Error Scenarios", () => {
    * Verifies error handling when multiple choices are selected for the same option.
    */
   it("should return error when selecting more than one option choice for the same option", () => {
-    // Arrange
-    const products = productsWithOptionChoicesFixture();
-    const inventory = createTestInventory(products);
+    // Arrange - Create test data with choices for the same option
+    const testOption = new ProductOptionBuilder()
+      .withId(OptionIds.FRAME_TYPE)
+      .withPrice(10)
+      .build();
+
+    const choice1 = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
+      .forOption(OptionIds.FRAME_TYPE)
+      .withPriceAdjustment(5)
+      .build();
+
+    const choice2 = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.DIAMOND_FRAME)
+      .forOption(OptionIds.FRAME_TYPE)
+      .withPriceAdjustment(10)
+      .build();
+
+    const testProduct = new ProductBuilder()
+      .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
+      .asCustomizable()
+      .withOption(testOption)
+      .withOptionChoice(choice1)
+      .withOptionChoice(choice2)
+      .build();
+
+    const inventory = createTestInventory([testProduct]);
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      CUSTOMIZABLE_PRODUCT_ID,
-      [OPTION_1_ID],
-      [1, 2] // Multiple choices for same option
+      ProductIds.CUSTOMIZABLE_PRODUCT,
+      [OptionIds.FRAME_TYPE],
+      [ChoiceIds.FULL_SUSPENSION_FRAME, ChoiceIds.DIAMOND_FRAME] // Multiple choices for same option
     );
 
     // Act
@@ -152,16 +172,21 @@ describe("SelectProductOption - Error Scenarios", () => {
    * Business Rule: Disabled choices cannot be selected due to constraint violations.
    */
   it("should return error when selecting a disabled choice", () => {
-    // Arrange
-    const products = productsWithIncompatibleConstraintsFixture();
+    // Arrange - Use scenario factory for incompatible constraints
+    const products = IncompatibleConstraintScenarios.productsCollection();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
+
     // Try to select both the constraining option and the constrained choice at the same time
     // This will trigger the constraint and disable the choice, then fail when trying to select it
+    // Note: IncompatibleConstraintScenarios uses option IDs 1, 3 and choice IDs 1, 5
     const command = new SelectProductOptionCommand(
-      CUSTOMIZABLE_PRODUCT_ID,
-      [OPTION_1_ID, OPTION_3_ID],
-      [CONSTRAINING_OPTION_CHOICE_ID, CONSTRAINED_OPTION_CHOICE_ID]
+      ProductIds.CUSTOMIZABLE_PRODUCT,
+      [1, 3], // Option IDs from the scenario
+      [
+        TestScenarios.CONSTRAINING_OPTION_CHOICE,
+        TestScenarios.CONSTRAINED_OPTION_CHOICE,
+      ]
     );
 
     // Act
@@ -170,7 +195,7 @@ describe("SelectProductOption - Error Scenarios", () => {
     // Assert
     expectError(
       actionResult,
-      `Choice with Id = ${CONSTRAINED_OPTION_CHOICE_ID} is disabled and cannot be selected`
+      `Choice with Id = ${TestScenarios.CONSTRAINED_OPTION_CHOICE} is disabled and cannot be selected`
     );
   });
 
@@ -179,13 +204,30 @@ describe("SelectProductOption - Error Scenarios", () => {
    * Business Rule: Invalid choice IDs should be ignored rather than causing errors.
    */
   it("should handle non-existent choice IDs gracefully", () => {
-    // Arrange
-    const products = productsWithOptionChoicesFixture();
-    const inventory = createTestInventory(products);
+    // Arrange - Create test data with choices using builders
+    const testOption = new ProductOptionBuilder()
+      .withId(OptionIds.FRAME_TYPE)
+      .withPrice(10)
+      .build();
+
+    const testChoice = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
+      .forOption(OptionIds.FRAME_TYPE)
+      .withPriceAdjustment(5)
+      .build();
+
+    const testProduct = new ProductBuilder()
+      .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
+      .asCustomizable()
+      .withOption(testOption)
+      .withOptionChoice(testChoice)
+      .build();
+
+    const inventory = createTestInventory([testProduct]);
     const action = createSelectAction(inventory);
     const command = new SelectProductOptionCommand(
-      CUSTOMIZABLE_PRODUCT_ID,
-      [OPTION_1_ID],
+      ProductIds.CUSTOMIZABLE_PRODUCT,
+      [OptionIds.FRAME_TYPE],
       [99999] // Non-existent choice ID
     );
 
@@ -194,27 +236,5 @@ describe("SelectProductOption - Error Scenarios", () => {
 
     // Assert - Should succeed and ignore invalid choice IDs (verify current behavior)
     expectSuccess(actionResult);
-  });
-
-  /**
-   * Demonstrates new builder pattern for creating focused test scenarios.
-   * This shows the future direction for test data creation.
-   */
-  it("should demonstrate new builder pattern for basic error case", () => {
-    // Arrange - explicit data creation using builders
-    const products = BasicProductScenarios.productsCollection();
-    const inventory = createTestInventory(products);
-    const action = createSelectAction(inventory);
-    const command = new SelectProductOptionCommand(
-      ProductIds.STANDARD_PRODUCT,
-      [1],
-      []
-    );
-
-    // Act
-    const actionResult = action.execute(command);
-
-    // Assert
-    expectError(actionResult, "Product is not customizable");
   });
 });

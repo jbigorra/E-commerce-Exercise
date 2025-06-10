@@ -4,26 +4,10 @@ import {
   ProductOptions,
 } from "../../../../../src/Store/Inventory/Core/Entities";
 import {
-  CASCADING_CHOICE_1_ID,
-  CASCADING_DISABLED_CHOICE_2_ID,
-  CASCADING_DISABLED_CHOICE_3_ID,
-  CASCADING_OPTION_1_ID,
-  CHOICE_1_ID,
-  CHOICE_2_ID,
-  CHOICE_3_ID,
-  CHOICE_4_ID,
-  CHOICE_5_ID,
-  CUSTOMIZABLE_PRODUCT_ID,
-  OPTION_1_ID,
-  OPTION_2_ID,
-  OPTION_3_ID,
-  OPTION_4_ID,
-  OPTION_5_ID,
-  OPTION_WITHOUT_CHOICES_ID,
-  productsWithCascadingConstraintsFixture,
-  productsWithManyOptionsFixture,
-  productsWithOptionsOnlyFixture,
-} from "../../../../Fixtures/Inventory";
+  ChoiceIds,
+  ProductIds,
+} from "../../../../Fixtures/constants/ProductConstants";
+import { EdgeCaseScenarios } from "../../../../Fixtures/scenarios/EdgeCaseScenarios";
 import { expectSuccess } from "../../../../Helpers/forActions/Matchers";
 import { createSelectAction, createTestInventory } from "./shared/test-setup";
 
@@ -36,25 +20,25 @@ describe("SelectProductOption - Edge Cases", () => {
    */
 
   it("should handle options that have no associated choices", () => {
-    const products = productsWithOptionsOnlyFixture();
+    const products = EdgeCaseScenarios.optionsOnlyCollection();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
     const actionResult = action.execute(
       new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_WITHOUT_CHOICES_ID],
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [6], // OPTION_WITHOUT_CHOICES_ID from scenario
         []
       )
     );
 
     expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
+      id: ProductIds.CUSTOMIZABLE_PRODUCT,
       options: (opts: ProductOptions) => {
         expect(opts.all).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
-              id: OPTION_WITHOUT_CHOICES_ID,
+              id: 6, // OPTION_WITHOUT_CHOICES_ID
               selected: true,
             }),
           ])
@@ -64,33 +48,33 @@ describe("SelectProductOption - Edge Cases", () => {
   });
 
   it("should handle cascading constraint effects", () => {
-    const products = productsWithCascadingConstraintsFixture();
+    const products = EdgeCaseScenarios.cascadingConstraintsCollection();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
     const actionResult = action.execute(
       new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [CASCADING_OPTION_1_ID],
-        [CASCADING_CHOICE_1_ID]
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [7], // CASCADING_OPTION_1_ID from scenario
+        [ChoiceIds.CASCADING_CHOICE_1]
       )
     );
 
     expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
+      id: ProductIds.CUSTOMIZABLE_PRODUCT,
       optionChoices: (choices: ProductOptionChoices) => {
         expect(choices.all).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
-              id: CASCADING_CHOICE_1_ID,
+              id: ChoiceIds.CASCADING_CHOICE_1,
               selected: true,
             }),
             expect.objectContaining({
-              id: CASCADING_DISABLED_CHOICE_2_ID,
+              id: ChoiceIds.CASCADING_DISABLED_CHOICE_2,
               disabled: true,
             }),
             expect.objectContaining({
-              id: CASCADING_DISABLED_CHOICE_3_ID,
+              id: ChoiceIds.CASCADING_DISABLED_CHOICE_3,
               disabled: true,
             }),
           ])
@@ -100,35 +84,30 @@ describe("SelectProductOption - Edge Cases", () => {
   });
 
   it("should handle selecting many options and choices simultaneously", () => {
-    const products = productsWithManyOptionsFixture();
+    const products = EdgeCaseScenarios.manyOptionsCollection();
     const inventory = createTestInventory(products);
     const action = createSelectAction(inventory);
 
-    const manyOptionIds = [
-      OPTION_1_ID,
-      OPTION_2_ID,
-      OPTION_3_ID,
-      OPTION_4_ID,
-      OPTION_5_ID,
-    ];
+    // Use the first 5 options and choices from the many options scenario
+    const manyOptionIds = [1, 2, 3, 4, 5]; // Option IDs from scenario
     const manyChoiceIds = [
-      CHOICE_1_ID,
-      CHOICE_2_ID,
-      CHOICE_3_ID,
-      CHOICE_4_ID,
-      CHOICE_5_ID,
+      ChoiceIds.CHOICE_1,
+      ChoiceIds.CHOICE_2,
+      ChoiceIds.CHOICE_3,
+      ChoiceIds.CHOICE_4,
+      ChoiceIds.CHOICE_5,
     ];
 
     const actionResult = action.execute(
       new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
+        ProductIds.CUSTOMIZABLE_PRODUCT,
         manyOptionIds,
         manyChoiceIds
       )
     );
 
     expectSuccess(actionResult, {
-      id: CUSTOMIZABLE_PRODUCT_ID,
+      id: ProductIds.CUSTOMIZABLE_PRODUCT,
       options: (opts: ProductOptions) => {
         const selectedOptions = opts.all.filter((o) => o.selected);
         expect(selectedOptions).toHaveLength(5);

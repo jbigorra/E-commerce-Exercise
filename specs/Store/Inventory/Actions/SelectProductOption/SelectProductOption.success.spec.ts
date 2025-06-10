@@ -12,16 +12,9 @@ import {
   ChoiceIds,
   OptionIds,
   ProductIds,
+  TestScenarios,
 } from "../../../../Fixtures/constants/ProductConstants";
-import {
-  CUSTOMIZABLE_PRODUCT_ID,
-  EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE,
-  OPTION_1_ID,
-  OPTION_2_ID,
-  OPTION_3_ID,
-  productsFixture,
-  productsWithOptionChoicesFixture,
-} from "../../../../Fixtures/Inventory";
+import { BasicProductScenarios } from "../../../../Fixtures/scenarios/BasicProductScenarios";
 import { expectSuccess } from "../../../../Helpers/forActions/Matchers";
 import {
   expectSelectedChoices,
@@ -48,7 +41,7 @@ describe("SelectProductOption - Success Scenarios", () => {
     let inventory: IInventory;
 
     beforeEach(() => {
-      products = productsFixture();
+      products = BasicProductScenarios.productsCollection();
       inventory = createTestInventory(products);
     });
 
@@ -60,8 +53,8 @@ describe("SelectProductOption - Success Scenarios", () => {
       // Arrange
       const action = createSelectAction(inventory);
       const command = new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID],
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [1],
         []
       );
 
@@ -70,13 +63,13 @@ describe("SelectProductOption - Success Scenarios", () => {
 
       // Assert
       expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
         options: (opts: ProductOptions) => {
           expect(opts.all).toEqual(
             expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: false }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: false }),
+              expect.objectContaining({ id: 1, selected: true }),
+              expect.objectContaining({ id: 2, selected: false }),
+              expect.objectContaining({ id: 3, selected: false }),
             ])
           );
         },
@@ -91,8 +84,8 @@ describe("SelectProductOption - Success Scenarios", () => {
       // Arrange
       const action = createSelectAction(inventory);
       const command = new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID, OPTION_2_ID],
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [1, 2],
         []
       );
 
@@ -101,13 +94,13 @@ describe("SelectProductOption - Success Scenarios", () => {
 
       // Assert
       expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
         options: (opts: ProductOptions) => {
           expect(opts.all).toEqual(
             expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: false }),
+              expect.objectContaining({ id: 1, selected: true }),
+              expect.objectContaining({ id: 2, selected: true }),
+              expect.objectContaining({ id: 3, selected: false }),
             ])
           );
         },
@@ -122,8 +115,8 @@ describe("SelectProductOption - Success Scenarios", () => {
       // Arrange
       const action = createSelectAction(inventory);
       const command = new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [1, 2, 3],
         []
       );
 
@@ -132,13 +125,13 @@ describe("SelectProductOption - Success Scenarios", () => {
 
       // Assert
       expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
         options: (opts: ProductOptions) => {
           expect(opts.all).toEqual(
             expect.arrayContaining([
-              expect.objectContaining({ id: OPTION_1_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_2_ID, selected: true }),
-              expect.objectContaining({ id: OPTION_3_ID, selected: true }),
+              expect.objectContaining({ id: 1, selected: true }),
+              expect.objectContaining({ id: 2, selected: true }),
+              expect.objectContaining({ id: 3, selected: true }),
             ])
           );
         },
@@ -187,54 +180,49 @@ describe("SelectProductOption - Success Scenarios", () => {
       ]);
     });
 
-    it("should return the product with 2 option choices selected", () => {
-      const products = productsWithOptionChoicesFixture();
-      const inventory = createTestInventory(products);
-      const action = createSelectAction(inventory);
-
-      const actionResult = action.execute(
-        new SelectProductOptionCommand(
-          CUSTOMIZABLE_PRODUCT_ID,
-          [OPTION_1_ID, OPTION_2_ID],
-          [1, 3]
-        )
-      );
-
-      expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
-        optionChoices: (choices: ProductOptionChoices) => {
-          expect(choices.all).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({ id: 1, selected: true }),
-              expect.objectContaining({ id: 3, selected: true }),
-            ])
-          );
-          expect(choices.all.filter((c) => c.selected).length).toBe(2);
-        },
-      });
-    });
-  });
-
-  describe("Total price calculations", () => {
-    let products: Product[];
-    let inventory: IInventory;
-
-    beforeEach(() => {
-      products = productsFixture();
-      inventory = createTestInventory(products);
-    });
-
     /**
-     * Verifies price calculation accuracy.
-     * Business Rule: Total price = base price + sum of selected option prices.
+     * Verifies multiple choice selection with locally created test data.
+     * Business Rule: Multiple choices from different options can be selected simultaneously.
      */
-    it("should return the product with the total price calculated", () => {
-      // Arrange
+    it("should return the product with 2 option choices selected", () => {
+      // Arrange - Create focused test data with choices for multiple options
+      const frameOption = new ProductOptionBuilder()
+        .withId(OptionIds.FRAME_TYPE)
+        .withPrice(10)
+        .build();
+
+      const wheelsOption = new ProductOptionBuilder()
+        .withId(OptionIds.WHEELS)
+        .withPrice(20)
+        .build();
+
+      const frameChoice = new ProductOptionChoiceBuilder()
+        .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
+        .forOption(OptionIds.FRAME_TYPE)
+        .withPriceAdjustment(5)
+        .build();
+
+      const wheelsChoice = new ProductOptionChoiceBuilder()
+        .withId(ChoiceIds.ROAD_WHEELS)
+        .forOption(OptionIds.WHEELS)
+        .withPriceAdjustment(15)
+        .build();
+
+      const testProduct = new ProductBuilder()
+        .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
+        .asCustomizable()
+        .withOption(frameOption)
+        .withOption(wheelsOption)
+        .withOptionChoice(frameChoice)
+        .withOptionChoice(wheelsChoice)
+        .build();
+
+      const inventory = createTestInventory([testProduct]);
       const action = createSelectAction(inventory);
       const command = new SelectProductOptionCommand(
-        CUSTOMIZABLE_PRODUCT_ID,
-        [OPTION_1_ID, OPTION_2_ID, OPTION_3_ID],
-        []
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [OptionIds.FRAME_TYPE, OptionIds.WHEELS],
+        [ChoiceIds.FULL_SUSPENSION_FRAME, ChoiceIds.ROAD_WHEELS]
       );
 
       // Act
@@ -242,43 +230,42 @@ describe("SelectProductOption - Success Scenarios", () => {
 
       // Assert
       expectSuccess(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
-        totalPrice: (price: number) => {
-          expect(price).toBe(EXPECTED_TOTAL_CUSTOMIZABLE_PRODUCT_PRICE);
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
+        optionChoices: (choices: ProductOptionChoices) => {
+          expect(choices.all).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: ChoiceIds.FULL_SUSPENSION_FRAME,
+                selected: true,
+              }),
+              expect.objectContaining({
+                id: ChoiceIds.ROAD_WHEELS,
+                selected: true,
+              }),
+            ])
+          );
         },
       });
     });
   });
 
-  describe("Price adjustments", () => {
+  describe("Price calculations", () => {
     /**
-     * Verifies choice price adjustments with self-contained test data.
-     * Demonstrates test independence by creating all necessary data inline.
+     * Verifies that base product price is calculated correctly.
+     * Business Rule: Base price should be returned when no options are selected.
      */
-    it("should return the product total price considering the option choices selected", () => {
-      // Arrange - Create test data with explicit pricing
-      const BASE_PRICE = 20;
-      const OPTION_PRICE = 10;
-      const CHOICE_PRICE = 10;
-      const EXPECTED_TOTAL = BASE_PRICE + OPTION_PRICE + CHOICE_PRICE;
-
-      const testChoice = new ProductOptionChoiceBuilder()
-        .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
-        .forOption(OptionIds.FRAME_TYPE)
-        .withPriceAdjustment(CHOICE_PRICE)
-        .build();
-
+    it("should return the product with the base price when no option choice selected", () => {
+      // Arrange - Create minimal test product with explicit pricing
       const testOption = new ProductOptionBuilder()
         .withId(OptionIds.FRAME_TYPE)
-        .withPrice(OPTION_PRICE)
+        .withPrice(10)
         .build();
 
       const testProduct = new ProductBuilder()
         .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
         .asCustomizable()
-        .withBasePrice(BASE_PRICE)
+        .withBasePrice(20)
         .withOption(testOption)
-        .withOptionChoice(testChoice)
         .build();
 
       const inventory = createTestInventory([testProduct]);
@@ -286,15 +273,95 @@ describe("SelectProductOption - Success Scenarios", () => {
       const command = new SelectProductOptionCommand(
         ProductIds.CUSTOMIZABLE_PRODUCT,
         [OptionIds.FRAME_TYPE],
-        [ChoiceIds.FULL_SUSPENSION_FRAME]
+        []
       );
 
       // Act
       const actionResult = action.execute(command);
 
-      // Assert - Use enhanced matcher for clear price verification
+      // Assert
       expectSuccess(actionResult);
-      expectTotalPrice(actionResult.result!, EXPECTED_TOTAL);
+      expectTotalPrice(actionResult.result!, 30); // 20 base + 10 option
+    });
+
+    /**
+     * Verifies complete price calculation with options and choices.
+     * Business Rule: Total = base price + option prices + choice adjustments.
+     */
+    it("should return the product with the total price when option choices are selected", () => {
+      // Arrange - Create complete pricing scenario
+      const frameOption = new ProductOptionBuilder()
+        .withId(OptionIds.FRAME_TYPE)
+        .withPrice(10)
+        .build();
+
+      const wheelsOption = new ProductOptionBuilder()
+        .withId(OptionIds.WHEELS)
+        .withPrice(20)
+        .build();
+
+      const frameChoice = new ProductOptionChoiceBuilder()
+        .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
+        .forOption(OptionIds.FRAME_TYPE)
+        .withPriceAdjustment(15) // Premium upgrade
+        .build();
+
+      const wheelsChoice = new ProductOptionChoiceBuilder()
+        .withId(ChoiceIds.ROAD_WHEELS)
+        .forOption(OptionIds.WHEELS)
+        .withPriceAdjustment(25) // Premium wheels
+        .build();
+
+      const testProduct = new ProductBuilder()
+        .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
+        .asCustomizable()
+        .withBasePrice(20)
+        .withOption(frameOption)
+        .withOption(wheelsOption)
+        .withOptionChoice(frameChoice)
+        .withOptionChoice(wheelsChoice)
+        .build();
+
+      const inventory = createTestInventory([testProduct]);
+      const action = createSelectAction(inventory);
+      const command = new SelectProductOptionCommand(
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [OptionIds.FRAME_TYPE, OptionIds.WHEELS],
+        [ChoiceIds.FULL_SUSPENSION_FRAME, ChoiceIds.ROAD_WHEELS]
+      );
+
+      // Act
+      const actionResult = action.execute(command);
+
+      // Assert - Total: 20 base + 10 frame + 20 wheels + 15 frame adj + 25 wheels adj = 90
+      expectSuccess(actionResult);
+      expectTotalPrice(actionResult.result!, 90);
+    });
+
+    /**
+     * Verifies legacy price calculation maintains compatibility.
+     * Uses expected total from original test to ensure backwards compatibility.
+     */
+    it("should return product with expected total matching legacy calculation", () => {
+      // Arrange - Use standard test data that matches legacy expectations
+      const products = BasicProductScenarios.productsCollection();
+      const inventory = createTestInventory(products);
+      const action = createSelectAction(inventory);
+      const command = new SelectProductOptionCommand(
+        ProductIds.CUSTOMIZABLE_PRODUCT,
+        [1, 2, 3], // BasicProductScenarios uses option IDs 1, 2, 3
+        []
+      );
+
+      // Act
+      const actionResult = action.execute(command);
+
+      // Assert - Verify matches legacy expected total
+      expectSuccess(actionResult);
+      expectTotalPrice(
+        actionResult.result!,
+        TestScenarios.EXPECTED_TOTAL_CUSTOMIZABLE_PRICE
+      );
     });
   });
 });

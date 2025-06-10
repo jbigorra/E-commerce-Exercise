@@ -12,11 +12,10 @@ import {
 } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
 import { IInventory } from "../../../src/Store/Inventory/Interfaces";
 import {
-  CUSTOMIZABLE_PRODUCT_ID,
-  NOT_FOUND_PRODUCT_ID,
-  productsFixture,
-  STANDARD_PRODUCT_ID,
-} from "../../Fixtures/Inventory";
+  ProductIds,
+  TestScenarios,
+} from "../../Fixtures/constants/ProductConstants";
+import { BasicProductScenarios } from "../../Fixtures/scenarios/BasicProductScenarios";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
 describe("ViewProduct", () => {
@@ -24,7 +23,7 @@ describe("ViewProduct", () => {
   let inventory: IInventory;
 
   beforeEach(() => {
-    products = productsFixture();
+    products = BasicProductScenarios.productsCollection();
     inventory = new InMemoryInventory(new ProductRepository(products));
   });
 
@@ -33,7 +32,7 @@ describe("ViewProduct", () => {
       const action = new ViewProduct(inventory);
 
       const actionResult = action.execute(
-        new ViewProductCommand(NOT_FOUND_PRODUCT_ID)
+        new ViewProductCommand(TestScenarios.NOT_FOUND_PRODUCT)
       );
       expectError(actionResult, "Product not found");
     });
@@ -44,11 +43,11 @@ describe("ViewProduct", () => {
       const action = new ViewProduct(inventory);
 
       const actionResult = action.execute(
-        new ViewProductCommand(STANDARD_PRODUCT_ID)
+        new ViewProductCommand(ProductIds.STANDARD_PRODUCT)
       );
 
       expectSuccess<Product>(actionResult, {
-        id: STANDARD_PRODUCT_ID,
+        id: ProductIds.STANDARD_PRODUCT,
         type: "standard",
         options: (opts: ProductOptions) => expect(opts.length).toEqual(0),
       });
@@ -58,11 +57,11 @@ describe("ViewProduct", () => {
       const action = new ViewProduct(inventory);
 
       const actionResult = action.execute(
-        new ViewProductCommand(CUSTOMIZABLE_PRODUCT_ID)
+        new ViewProductCommand(ProductIds.CUSTOMIZABLE_PRODUCT)
       );
 
       expectSuccess<Product>(actionResult, {
-        id: CUSTOMIZABLE_PRODUCT_ID,
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
         type: "customizable",
         options: (opts: ProductOptions) =>
           expect(opts.length).toBeGreaterThanOrEqual(3),
@@ -71,12 +70,12 @@ describe("ViewProduct", () => {
 
     it.each([
       {
-        id: STANDARD_PRODUCT_ID,
+        id: ProductIds.STANDARD_PRODUCT,
         expectedType: "standard" as const,
         expectedBasePrice: 20,
       },
       {
-        id: CUSTOMIZABLE_PRODUCT_ID,
+        id: ProductIds.CUSTOMIZABLE_PRODUCT,
         expectedType: "customizable" as const,
         expectedBasePrice: 20,
       },
