@@ -1,17 +1,17 @@
 import {
   SelectProductOption,
   SelectProductOptionCommand,
-} from "../../../src/Store/Inventory/Actions/SelectProductOption";
+} from "../../../../src/Store/Inventory/Actions/SelectProductOption";
 import {
   Product,
   ProductOptionChoices,
   ProductOptions,
-} from "../../../src/Store/Inventory/Core/Entities";
+} from "../../../../src/Store/Inventory/Core/Entities";
 import {
   InMemoryInventory,
   ProductRepository,
-} from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { IInventory } from "../../../src/Store/Inventory/Interfaces";
+} from "../../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import { IInventory } from "../../../../src/Store/Inventory/Interfaces";
 import {
   CASCADING_CHOICE_1_ID,
   CASCADING_DISABLED_CHOICE_2_ID,
@@ -47,8 +47,11 @@ import {
   productsWithPriceConstraintsFixture,
   STANDARD_PRODUCT_ID,
   UNAVAILABLE_OPTION_ID,
-} from "../../Fixtures/Inventory";
-import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
+} from "../../../Fixtures/Inventory";
+import {
+  expectError,
+  expectSuccess,
+} from "../../../Helpers/forActions/Matchers";
 
 describe("SelectProductOption", () => {
   describe("Errors", () => {
