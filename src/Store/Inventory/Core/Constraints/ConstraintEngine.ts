@@ -6,7 +6,7 @@ import { ConstraintStrategy } from "./Interfaces";
 import { PriceConstraintHandler } from "./PriceConstraintHandler";
 
 class DefaultConstraintHandler implements ConstraintStrategy {
-  canHandle(constraint: Constraint): boolean {
+  canHandle(constraint: Constraint): constraint is Constraint {
     return true;
   }
 
@@ -34,8 +34,9 @@ export class ConstraintEngine {
   ): Result<void> {
     for (const constraint of constraints) {
       const handler =
-        this.handlers.find((h) => h.canHandle(constraint)) ??
-        this.defaultHandler;
+        this.handlers.find((h: ConstraintStrategy<typeof constraint>) =>
+          h.canHandle(constraint)
+        ) ?? this.defaultHandler;
 
       const result = handler.apply(constraint, context);
 

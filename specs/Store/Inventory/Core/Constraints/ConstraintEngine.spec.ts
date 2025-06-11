@@ -2,6 +2,8 @@ import { ConstraintContext } from "../../../../../src/Store/Inventory/Core/Const
 import { ConstraintEngine } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintEngine";
 import {
   Constraint,
+  IncompatibleConstraint,
+  PriceConstraint,
   ProductOptionChoice,
 } from "../../../../../src/Store/Inventory/Core/Entities";
 import { OptionId } from "../../../../../src/Store/Inventory/Core/ValueObjects";
@@ -50,7 +52,7 @@ describe("ConstraintEngine", () => {
     });
 
     it("should succeed with valid price constraint", () => {
-      const priceConstraint: Constraint = {
+      const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,
@@ -64,7 +66,7 @@ describe("ConstraintEngine", () => {
     });
 
     it("should succeed with valid incompatible constraint", () => {
-      const incompatibleConstraint: Constraint = {
+      const incompatibleConstraint: IncompatibleConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,

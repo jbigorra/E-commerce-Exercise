@@ -1,22 +1,20 @@
-import { Constraint } from "../Entities";
+import { Constraint, PriceConstraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
 import { ConstraintStrategy } from "./Interfaces";
 
-export class PriceConstraintHandler implements ConstraintStrategy {
-  canHandle(constraint: Constraint): boolean {
+export class PriceConstraintHandler
+  implements ConstraintStrategy<PriceConstraint>
+{
+  canHandle(constraint: Constraint): constraint is PriceConstraint {
     return constraint.type === "price";
   }
 
-  apply(constraint: Constraint, context: ConstraintContext): Result<void> {
-    if (!this.canHandle(constraint)) {
-      return Result.error(new Error("Cannot handle non-price constraint"));
-    }
-
+  apply(constraint: PriceConstraint, context: ConstraintContext): Result<void> {
     if (constraint.constrainedBy === context.selectedOptionId.value) {
       const choice = context.findChoiceById(constraint.optionChoiceId);
 
-      if (choice && constraint.type === "price") {
+      if (choice) {
         // Apply price adjustment - the constraint already has priceAdjustment
         // This would typically modify the choice's price or add additional cost
         // For now, we'll just mark it as processed since the price adjustment

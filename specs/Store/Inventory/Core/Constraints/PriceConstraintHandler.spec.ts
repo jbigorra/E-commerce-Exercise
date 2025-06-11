@@ -1,7 +1,8 @@
 import { ConstraintContext } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintContext";
 import { PriceConstraintHandler } from "../../../../../src/Store/Inventory/Core/Constraints/PriceConstraintHandler";
 import {
-  Constraint,
+  IncompatibleConstraint,
+  PriceConstraint,
   ProductOptionChoice,
 } from "../../../../../src/Store/Inventory/Core/Entities";
 import { OptionId } from "../../../../../src/Store/Inventory/Core/ValueObjects";
@@ -35,7 +36,7 @@ describe("PriceConstraintHandler", () => {
 
   describe("canHandle", () => {
     it("should handle price constraints", () => {
-      const priceConstraint: Constraint = {
+      const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,
@@ -47,7 +48,7 @@ describe("PriceConstraintHandler", () => {
     });
 
     it("should not handle incompatible constraints", () => {
-      const incompatibleConstraint: Constraint = {
+      const incompatibleConstraint: IncompatibleConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,
@@ -59,24 +60,8 @@ describe("PriceConstraintHandler", () => {
   });
 
   describe("handle", () => {
-    it("should return error for non-price constraint", () => {
-      const incompatibleConstraint: Constraint = {
-        id: 1,
-        optionChoiceId: 101,
-        constrainedBy: 1,
-        type: "incompatible",
-      };
-
-      const result = handler.apply(incompatibleConstraint, context);
-
-      expect(result.isError()).toBe(true);
-      expect(result.getError().message).toBe(
-        "Cannot handle non-price constraint"
-      );
-    });
-
     it("should successfully handle price constraint when constrainedBy matches", () => {
-      const priceConstraint: Constraint = {
+      const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,
@@ -90,7 +75,7 @@ describe("PriceConstraintHandler", () => {
     });
 
     it("should handle price constraint when constrainedBy doesn't match", () => {
-      const priceConstraint: Constraint = {
+      const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 2, // Different from context's selectedOptionId
@@ -104,7 +89,7 @@ describe("PriceConstraintHandler", () => {
     });
 
     it("should handle price constraint when choice is not found", () => {
-      const priceConstraint: Constraint = {
+      const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 999, // Non-existent choice
         constrainedBy: 1,

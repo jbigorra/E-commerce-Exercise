@@ -1,20 +1,19 @@
-import { Constraint } from "../Entities";
+import { Constraint, IncompatibleConstraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
 import { ConstraintStrategy } from "./Interfaces";
 
-export class IncompatibleConstraintHandler implements ConstraintStrategy {
-  canHandle(constraint: Constraint): boolean {
+export class IncompatibleConstraintHandler
+  implements ConstraintStrategy<IncompatibleConstraint>
+{
+  canHandle(constraint: Constraint): constraint is IncompatibleConstraint {
     return constraint.type === "incompatible";
   }
 
-  apply(constraint: Constraint, context: ConstraintContext): Result<void> {
-    if (!this.canHandle(constraint)) {
-      return Result.error(
-        new Error("Cannot handle non-incompatible constraint")
-      );
-    }
-
+  apply(
+    constraint: IncompatibleConstraint,
+    context: ConstraintContext
+  ): Result<void> {
     if (constraint.constrainedBy === context.selectedOptionId.value) {
       const choice = context.findChoiceById(constraint.optionChoiceId);
 

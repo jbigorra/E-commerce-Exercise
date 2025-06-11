@@ -33,22 +33,25 @@ export type ProductOptionChoice = {
   constraints: Constraint[];
 };
 
-export type Constraint = Prettify<
+export type Constraint = {
+  id: number;
+  type: "price" | "incompatible";
+  optionChoiceId: number;
+  constrainedBy: number;
+};
+
+export type PriceConstraint = Prettify<
   {
-    id: number;
-    optionChoiceId: number;
-    constrainedBy: number;
-  } & (PriceConstraint | IncompatibleConstraint)
+    type: "price";
+    priceAdjustment: number;
+  } & Constraint
 >;
 
-export type PriceConstraint = {
-  type: "price";
-  priceAdjustment: number;
-};
-
-export type IncompatibleConstraint = {
-  type: "incompatible";
-};
+export type IncompatibleConstraint = Prettify<
+  {
+    type: "incompatible";
+  } & Constraint
+>;
 
 export class ProductOptions {
   constructor(private readonly _list: ProductOption[]) {}
