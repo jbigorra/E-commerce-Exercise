@@ -1,24 +1,23 @@
-import { Product } from "../Core/Entities";
 import { ServiceFactory } from "../Core/Services/ServiceFactory";
 import { SelectedOptions } from "../Core/ValueObjects";
 import { IInventory } from "../Interfaces";
 import { ActionResult, Application } from "./Action";
+import { ProductDTO } from "./Dtos";
 
 export class SelectProductOptionCommand {
   constructor(
     readonly productId: number,
     readonly optionIds: number[] = [],
-    readonly optionChoicesIds: number[] = []
+    readonly optionChoicesIds: number[] = [],
   ) {}
 }
 
 export class SelectProductOption {
-  private readonly customizationService =
-    ServiceFactory.createProductCustomizationService();
+  private readonly customizationService = ServiceFactory.createProductCustomizationService();
 
   constructor(private readonly inventory: IInventory) {}
 
-  public execute(command: SelectProductOptionCommand): ActionResult<Product> {
+  public execute(command: SelectProductOptionCommand): ActionResult<ProductDTO> {
     try {
       const product = this.inventory.products.findById(command.productId);
 
@@ -28,21 +27,15 @@ export class SelectProductOption {
         return Application.error(new Error("Product is not customizable"));
       }
 
-      const selectedOptions = new SelectedOptions(
-        command.optionIds,
-        command.optionChoicesIds
-      );
+      const selectedOptions = new SelectedOptions(command.optionIds, command.optionChoicesIds);
 
-      const result = this.customizationService.customize(
-        product,
-        selectedOptions
-      );
+      const result = this.customizationService.customize(product, selectedOptions);
 
       if (result.isError()) {
         return Application.error(result.getError());
       }
 
-      return Application.success(product);
+      return Application.success(ProductDTO.from(product));
     } catch (error: any) {
       return Application.error(error);
     }

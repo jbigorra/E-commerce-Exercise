@@ -1,7 +1,4 @@
-import {
-  Constraint,
-  ProductOptionChoice,
-} from "../../../src/Store/Inventory/Core/Entities";
+import { Constraint, PartChoice } from "../../../src/Store/Inventory/Core/Entities";
 
 export class ProductOptionChoiceBuilder {
   private id: number = 101;
@@ -9,6 +6,7 @@ export class ProductOptionChoiceBuilder {
   private priceAdjustment: number = 0;
   private isSelected: boolean = false;
   private isDisabled: boolean = false;
+  private isOutOfStock: boolean = false;
   private constraints: Constraint[] = [];
 
   withId(id: number): ProductOptionChoiceBuilder {
@@ -36,16 +34,22 @@ export class ProductOptionChoiceBuilder {
     return this;
   }
 
+  outOfStock(isOutOfStock: boolean = true): ProductOptionChoiceBuilder {
+    this.isOutOfStock = isOutOfStock;
+    return this;
+  }
+
   withConstraint(constraint: Constraint): ProductOptionChoiceBuilder {
     this.constraints.push(constraint);
     return this;
   }
 
-  build(): ProductOptionChoice {
+  build(): PartChoice {
     return {
       id: this.id,
-      optionId: this.optionId,
+      partId: this.optionId,
       priceAdjustment: this.priceAdjustment,
+      outOfStock: this.isOutOfStock,
       selected: this.isSelected,
       disabled: this.isDisabled,
       constraints: [...this.constraints],

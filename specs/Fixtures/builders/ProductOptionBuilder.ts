@@ -1,4 +1,4 @@
-import { ProductOption } from "../../../src/Store/Inventory/Core/Entities";
+import { Part } from "../../../src/Store/Inventory/Core/Entities";
 
 export class ProductOptionBuilder {
   private id: number = 1;
@@ -14,7 +14,7 @@ export class ProductOptionBuilder {
     return this;
   }
 
-  build(): ProductOption {
+  build(): Part {
     return {
       id: this.id,
       price: this.price,
