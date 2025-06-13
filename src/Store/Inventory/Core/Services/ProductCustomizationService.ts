@@ -20,18 +20,6 @@ export class DefaultProductCustomizationService
   ) {}
 
   customize(product: Product, options: SelectedOptions): Result<Product> {
-    if (product.type === "standard") {
-      return Result.error(new Error("Product is not customizable"));
-    }
-
-    if (options.hasOptions() === false) {
-      return Result.error(
-        new Error(
-          "At least one product option must be selected to customize the product"
-        )
-      );
-    }
-
     this.disableIncompatibleChoices(product, options);
     this.choiceSelectionService.selectChoices(product, options);
 

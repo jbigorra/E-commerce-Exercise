@@ -165,4 +165,8 @@ export class Product {
 
     return selected.reduce(sumByPriceConstraint, 0);
   }
+
+  public isNotCustomizable(): boolean {
+    return this.type === "standard";
+  }
 }

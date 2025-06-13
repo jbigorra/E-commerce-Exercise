@@ -15,7 +15,7 @@ export class SelectedOptions {
       );
     }
 
-    if (this.hasIncompatibleChoices()) {
+    if (this.hasRepeatedChoices()) {
       throw new Error("Only one part choice can be selected per part");
     }
   }
@@ -28,7 +28,7 @@ export class SelectedOptions {
     return this.choiceIds.length > 0;
   }
 
-  hasIncompatibleChoices(): boolean {
+  hasRepeatedChoices(): boolean {
     let countRepeatedChoices = this.choiceIds.reduce((acc, choiceId) => {
       if (this.choiceIds.filter((id) => id === choiceId).length > 1) {
         acc++;

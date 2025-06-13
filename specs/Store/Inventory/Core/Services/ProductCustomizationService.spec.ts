@@ -132,31 +132,6 @@ describe("ProductCustomizationService", () => {
   });
 
   describe("customize", () => {
-    it("should reject standard products", () => {
-      const standardProduct = new ProductBuilder()
-        .withId(ProductIds.STANDARD_PRODUCT)
-        .asStandard()
-        .build();
-
-      const selectedOptions = new SelectedOptions([OptionIds.FRAME_TYPE], []);
-
-      const result = service.customize(standardProduct, selectedOptions);
-
-      expect(result.isError()).toBe(true);
-      expect(result.getError().message).toBe("Product is not customizable");
-    });
-
-    it("should require at least one option", () => {
-      const selectedOptions = new SelectedOptions([], []);
-
-      const result = service.customize(product, selectedOptions);
-
-      expect(result.isError()).toBe(true);
-      expect(result.getError().message).toBe(
-        "At least one product option must be selected to customize the product"
-      );
-    });
-
     it("should disable incompatible choices", () => {
       const selectedOptions = new SelectedOptions(
         [OptionIds.FRAME_TYPE, OptionIds.WHEELS],

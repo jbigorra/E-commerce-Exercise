@@ -19,24 +19,32 @@ export class SelectProductOption {
   constructor(private readonly inventory: IInventory) {}
 
   public execute(command: SelectProductOptionCommand): ActionResult<Product> {
-    const product = this.inventory.products.findById(command.productId);
+    try {
+      const product = this.inventory.products.findById(command.productId);
 
-    if (!product) return Application.error(new Error("Product not found"));
+      if (!product) return Application.error(new Error("Product not found"));
 
-    const selectedOptions = new SelectedOptions(
-      command.optionIds,
-      command.optionChoicesIds
-    );
+      if (product.isNotCustomizable()) {
+        return Application.error(new Error("Product is not customizable"));
+      }
 
-    const result = this.customizationService.customize(
-      product,
-      selectedOptions
-    );
+      const selectedOptions = new SelectedOptions(
+        command.optionIds,
+        command.optionChoicesIds
+      );
 
-    if (result.isError()) {
-      return Application.error(result.getError());
+      const result = this.customizationService.customize(
+        product,
+        selectedOptions
+      );
+
+      if (result.isError()) {
+        return Application.error(result.getError());
+      }
+
+      return Application.success(product);
+    } catch (error: any) {
+      return Application.error(error);
     }
-
-    return Application.success(product);
   }
 }

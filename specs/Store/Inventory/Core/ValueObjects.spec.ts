@@ -43,7 +43,7 @@ describe("ValueObjects", () => {
 
         const selectedOptions = new SelectedOptions(partIds, partChoiceIds);
         expect(selectedOptions.partIds).toEqual(partIds);
-        expect(selectedOptions.partChoiceIds).toEqual(partChoiceIds);
+        expect(selectedOptions.choiceIds).toEqual(partChoiceIds);
       });
     });
   });
