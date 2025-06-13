@@ -25,7 +25,8 @@ export function expectProductSuccess(
   if (assertions?.options) assertions.options(result.result!.options);
   if (assertions?.optionChoices)
     assertions.optionChoices(result.result!.optionChoices);
-  if (assertions?.totalPrice) assertions.totalPrice(result.result!.totalPrice);
+  if (assertions?.totalPrice)
+    assertions.totalPrice(result.result!.currentTotalPrice);
 }
 
 /**
@@ -70,7 +71,7 @@ export function expectSelectedChoices(
  * Verify exact total price with business context
  */
 export function expectTotalPrice(product: Product, expectedPrice: number) {
-  expect(product.totalPrice).toBe(expectedPrice);
+  expect(product.currentTotalPrice).toBe(expectedPrice);
 }
 
 /**

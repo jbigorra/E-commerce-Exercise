@@ -21,7 +21,6 @@ export type Inventory = {
 export type ProductOption = {
   id: number;
   price: number;
-  selected: boolean;
 };
 
 export type ProductOptionChoice = {
@@ -62,10 +61,6 @@ export class ProductOptions {
 
   public get all(): ProductOption[] {
     return this._list;
-  }
-
-  public calculateTotalBasePrice(): number {
-    return this._list.reduce((acc, o) => acc + o.price, 0);
   }
 
   public findById(id: number): ProductOption | undefined {
@@ -123,10 +118,9 @@ export class Product {
     this._optionChoices = optionChoices;
   }
 
-  public get totalPrice(): number {
+  public get currentTotalPrice(): number {
     return (
       this.basePrice +
-      this._options.calculateTotalBasePrice() +
       this._optionChoices.calculateTotalPriceAdjustment() +
       this.calculatePriceConstraints()
     );

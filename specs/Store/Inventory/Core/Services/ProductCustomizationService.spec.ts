@@ -169,7 +169,6 @@ describe("ProductCustomizationService", () => {
     /**
      * This test should consider:
      * - The base price of the product
-     * - The price adjustments of the selected options
      * - The price adjustments of the selected choices
      * - The price adjustments of the constrained choices
      */
@@ -182,7 +181,7 @@ describe("ProductCustomizationService", () => {
       const result = service.customize(product, selectedOptions);
 
       expect(result.isSuccess()).toBe(true);
-      expect(result.getValue().totalPrice).toBe(115);
+      expect(result.getValue().currentTotalPrice).toBe(55);
     });
 
     it("should handle constraints during customization", () => {
@@ -198,7 +197,7 @@ describe("ProductCustomizationService", () => {
       const result = service.customize(product, selectedOptions);
 
       expect(result.isSuccess()).toBe(true);
-      expect(result.getValue().totalPrice).toBe(125);
+      expect(result.getValue().currentTotalPrice).toBe(65);
     });
   });
 });
