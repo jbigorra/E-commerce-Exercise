@@ -37,7 +37,7 @@ export type Constraint = {
   id: number;
   type: "price" | "incompatible";
   optionChoiceId: number;
-  constrainedBy: number;
+  constrainedByChoiceId: number;
 };
 
 export type PriceConstraint = Prettify<
@@ -64,10 +64,8 @@ export class ProductOptions {
     return this._list;
   }
 
-  public selectedTotalPrice(): number {
-    return this._list
-      .filter((o) => o.selected)
-      .reduce((acc, o) => acc + o.price, 0);
+  public calculateTotalBasePrice(): number {
+    return this._list.reduce((acc, o) => acc + o.price, 0);
   }
 
   public findById(id: number): ProductOption | undefined {
@@ -99,10 +97,14 @@ export class ProductOptionChoices {
     return this._list.filter((oc) => oc.optionId === optionId);
   }
 
-  public selectedChoicesTotalPriceAdjustment(): number {
+  public calculateTotalPriceAdjustment(): number {
     return this._list
       .filter((oc) => oc.selected)
       .reduce((acc, oc) => acc + oc.priceAdjustment, 0);
+  }
+
+  public get selected(): ProductOptionChoice[] {
+    return this._list.filter((oc) => oc.selected && !oc.disabled);
   }
 }
 
@@ -124,8 +126,9 @@ export class Product {
   public get totalPrice(): number {
     return (
       this.basePrice +
-      this._options.selectedTotalPrice() +
-      this._optionChoices.selectedChoicesTotalPriceAdjustment()
+      this._options.calculateTotalBasePrice() +
+      this._optionChoices.calculateTotalPriceAdjustment() +
+      this.calculatePriceConstraints()
     );
   }
 
@@ -137,11 +140,29 @@ export class Product {
     return this._optionChoices;
   }
 
-  private _isNotCustomizable(): boolean {
-    return this.type === "standard";
-  }
+  private calculatePriceConstraints(): number {
+    const selected = this._optionChoices.selected;
+    const constraints = selected
+      .flatMap((oc) => oc.constraints)
+      .filter((constraint) => constraint.type === "price");
 
-  public isCustomizable(): boolean {
-    return !this._isNotCustomizable();
+    const sumByPriceConstraint = (
+      sum: number,
+      selectedChoice: ProductOptionChoice
+    ) => {
+      const priceConstraints = constraints.filter(
+        (constraint) => constraint.constrainedByChoiceId === selectedChoice.id
+      ) as PriceConstraint[];
+
+      if (priceConstraints.length > 0) {
+        priceConstraints.forEach((constraint) => {
+          sum += constraint.priceAdjustment;
+        });
+      }
+
+      return sum;
+    };
+
+    return selected.reduce(sumByPriceConstraint, 0);
   }
 }
