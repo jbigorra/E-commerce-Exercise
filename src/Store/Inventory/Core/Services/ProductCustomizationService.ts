@@ -1,4 +1,3 @@
-import { ConstraintEngine } from "../Constraints/ConstraintEngine";
 import { Product } from "../Entities";
 import { Result } from "../Result";
 import { SelectedOptions } from "../ValueObjects";
@@ -9,10 +8,7 @@ export interface ProductCustomizationService {
 }
 
 export class DefaultProductCustomizationService implements ProductCustomizationService {
-  constructor(
-    private readonly choiceSelectionService: ChoiceSelectionService,
-    private readonly productStrategy: ConstraintEngine
-  ) {}
+  constructor(private readonly choiceSelectionService: ChoiceSelectionService) {}
 
   customize(product: Product, options: SelectedOptions): Result<Product> {
     this.disableIncompatibleChoices(product, options);
