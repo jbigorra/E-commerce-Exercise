@@ -4,6 +4,7 @@
   "description": "Technical challenge provided by a company",
   "main": "main.ts",
   "scripts": {
+    "test:jest": "jest -i",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
     "tdd": "bun test --watch",
