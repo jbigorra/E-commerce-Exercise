@@ -6,11 +6,7 @@ import {
   DefaultProductCustomizationService,
   ProductCustomizationService,
 } from "../../../../../src/Store/Inventory/Core/Services/ProductCustomizationService";
-import {
-  ChoiceId,
-  OptionId,
-  SelectedOptions,
-} from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import { SelectedOptions } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 import { ConstraintBuilder } from "../../../../Fixtures/builders/ConstraintBuilder";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
 import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";
@@ -36,43 +32,102 @@ describe("ProductCustomizationService", () => {
       constraintEngine
     );
 
-    // Create focused test data using builders
-    const option1 = new ProductOptionBuilder()
+    const FRAME_TYPE = new ProductOptionBuilder()
       .withId(OptionIds.FRAME_TYPE)
       .withPrice(10)
       .build();
 
-    const option2 = new ProductOptionBuilder()
+    const WHEELS = new ProductOptionBuilder()
       .withId(OptionIds.WHEELS)
       .withPrice(20)
       .build();
 
-    const option3 = new ProductOptionBuilder()
-      .withId(OptionIds.RIM_COLOR)
+    const FRAME_FINISH = new ProductOptionBuilder()
+      .withId(OptionIds.FRAME_FINISH)
       .withPrice(30)
       .build();
 
-    const choice1 = new ProductOptionChoiceBuilder()
+    const FULL_SUSPENSION_FRAME = new ProductOptionChoiceBuilder()
       .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
       .forOption(OptionIds.FRAME_TYPE)
       .withPriceAdjustment(5)
       .build();
 
-    const choice2 = new ProductOptionChoiceBuilder()
+    const DIAMOND_FRAME = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.DIAMOND_FRAME)
+      .forOption(OptionIds.FRAME_TYPE)
+      .withPriceAdjustment(5)
+      .build();
+
+    const ROAD_WHEELS = new ProductOptionChoiceBuilder()
       .withId(ChoiceIds.ROAD_WHEELS)
       .forOption(OptionIds.WHEELS)
       .withPriceAdjustment(10)
+      .withConstraint(
+        new ConstraintBuilder()
+          .withId(1)
+          .forChoice(ChoiceIds.ROAD_WHEELS)
+          .asIncompatible()
+          .constrainedByChoice(ChoiceIds.FULL_SUSPENSION_FRAME)
+          .build()
+      )
+      .build();
+
+    const FAT_BIKE_WHEELS = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.FAT_BIKE_WHEELS)
+      .forOption(OptionIds.WHEELS)
+      .withPriceAdjustment(15)
+      .build();
+
+    const MATTE_FINISH = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.MATTE_FINISH)
+      .forOption(OptionIds.FRAME_FINISH)
+      .withPriceAdjustment(15)
+      .withConstraint(
+        new ConstraintBuilder()
+          .withId(2)
+          .forChoice(ChoiceIds.MATTE_FINISH)
+          .asPrice(10)
+          .constrainedByChoice(ChoiceIds.FULL_SUSPENSION_FRAME)
+          .build()
+      )
+      .build();
+
+    const SHINY_FINISH = new ProductOptionChoiceBuilder()
+      .withId(ChoiceIds.SHINY_FINISH)
+      .forOption(OptionIds.FRAME_FINISH)
+      .withPriceAdjustment(15)
+      .withConstraint(
+        new ConstraintBuilder()
+          .withId(3)
+          .forChoice(ChoiceIds.SHINY_FINISH)
+          .asPrice(10)
+          .constrainedByChoice(ChoiceIds.FULL_SUSPENSION_FRAME)
+          .build()
+      )
+      .withConstraint(
+        new ConstraintBuilder()
+          .withId(4)
+          .forChoice(ChoiceIds.SHINY_FINISH)
+          .asPrice(5)
+          .constrainedByChoice(ChoiceIds.DIAMOND_FRAME)
+          .build()
+      )
       .build();
 
     product = new ProductBuilder()
       .withId(ProductIds.CUSTOMIZABLE_PRODUCT)
       .asCustomizable()
       .withBasePrice(20)
-      .withOption(option1)
-      .withOption(option2)
-      .withOption(option3)
-      .withOptionChoice(choice1)
-      .withOptionChoice(choice2)
+      .withOption(FRAME_TYPE)
+      .withOption(WHEELS)
+      .withOption(FRAME_FINISH)
+      .withOptionChoice(FULL_SUSPENSION_FRAME)
+      .withOptionChoice(DIAMOND_FRAME)
+      .withOptionChoice(ROAD_WHEELS)
+      .withOptionChoice(FAT_BIKE_WHEELS)
+      .withOptionChoice(MATTE_FINISH)
+      .withOptionChoice(SHINY_FINISH)
       .build();
   });
 
@@ -83,10 +138,7 @@ describe("ProductCustomizationService", () => {
         .asStandard()
         .build();
 
-      const selectedOptions = new SelectedOptions(
-        [new OptionId(OptionIds.FRAME_TYPE)],
-        []
-      );
+      const selectedOptions = new SelectedOptions([OptionIds.FRAME_TYPE], []);
 
       const result = service.customize(standardProduct, selectedOptions);
 
@@ -105,40 +157,73 @@ describe("ProductCustomizationService", () => {
       );
     });
 
-    it("should successfully customize with valid options", () => {
+    it("should disable incompatible choices", () => {
       const selectedOptions = new SelectedOptions(
-        [new OptionId(OptionIds.FRAME_TYPE)],
-        [new ChoiceId(ChoiceIds.FULL_SUSPENSION_FRAME)]
+        [OptionIds.FRAME_TYPE, OptionIds.WHEELS],
+        [ChoiceIds.FULL_SUSPENSION_FRAME, ChoiceIds.FAT_BIKE_WHEELS]
       );
 
       const result = service.customize(product, selectedOptions);
 
       expect(result.isSuccess()).toBe(true);
-      expect(result.getValue()).toBe(product);
+      expect(
+        result.getValue().optionChoices.findById(ChoiceIds.ROAD_WHEELS)!
+          .disabled
+      ).toBe(true);
+    });
+
+    it("should select valid choices for selected options", () => {
+      const selectedOptions = new SelectedOptions(
+        [OptionIds.FRAME_TYPE, OptionIds.WHEELS],
+        [ChoiceIds.FULL_SUSPENSION_FRAME, ChoiceIds.FAT_BIKE_WHEELS]
+      );
+
+      const result = service.customize(product, selectedOptions);
+
+      expect(result.isSuccess()).toBe(true);
+      const actualChoices = result.getValue().optionChoices;
+      expect(
+        actualChoices.findById(ChoiceIds.FULL_SUSPENSION_FRAME)!.selected
+      ).toBe(true);
+      expect(actualChoices.findById(ChoiceIds.FAT_BIKE_WHEELS)!.selected).toBe(
+        true
+      );
+      expect(actualChoices.all.filter((c) => c.selected).length).toBe(2);
+    });
+
+    /**
+     * This test should consider:
+     * - The base price of the product
+     * - The price adjustments of the selected options
+     * - The price adjustments of the selected choices
+     * - The price adjustments of the constrained choices
+     */
+    it("should apply price adjustments from price constrained choices", () => {
+      const selectedOptions = new SelectedOptions(
+        [OptionIds.FRAME_TYPE, OptionIds.FRAME_FINISH, OptionIds.WHEELS],
+        [ChoiceIds.DIAMOND_FRAME, ChoiceIds.SHINY_FINISH, ChoiceIds.ROAD_WHEELS]
+      );
+
+      const result = service.customize(product, selectedOptions);
+
+      expect(result.isSuccess()).toBe(true);
+      expect(result.getValue().totalPrice).toBe(115);
     });
 
     it("should handle constraints during customization", () => {
-      // Add constraint to choice using builder pattern
-      const constraint = new ConstraintBuilder()
-        .forChoice(ChoiceIds.ROAD_WHEELS)
-        .asIncompatible()
-        .constrainedBy(OptionIds.FRAME_TYPE)
-        .build();
-
-      const choiceToConstrain = product.optionChoices.findById(
-        ChoiceIds.ROAD_WHEELS
-      );
-      choiceToConstrain!.constraints = [constraint];
-
       const selectedOptions = new SelectedOptions(
-        [new OptionId(OptionIds.FRAME_TYPE)],
-        []
+        [OptionIds.FRAME_TYPE, OptionIds.FRAME_FINISH, OptionIds.WHEELS],
+        [
+          ChoiceIds.FULL_SUSPENSION_FRAME,
+          ChoiceIds.SHINY_FINISH,
+          ChoiceIds.FAT_BIKE_WHEELS,
+        ]
       );
 
       const result = service.customize(product, selectedOptions);
 
       expect(result.isSuccess()).toBe(true);
-      expect(choiceToConstrain!.disabled).toBe(true);
+      expect(result.getValue().totalPrice).toBe(125);
     });
   });
 });

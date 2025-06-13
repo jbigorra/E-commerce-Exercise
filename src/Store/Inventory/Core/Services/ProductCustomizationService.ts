@@ -2,7 +2,7 @@ import { ConstraintContext } from "../Constraints/ConstraintContext";
 import { ConstraintEngine } from "../Constraints/ConstraintEngine";
 import { Product } from "../Entities";
 import { Result } from "../Result";
-import { OptionId, SelectedOptions } from "../ValueObjects";
+import { SelectedOptions } from "../ValueObjects";
 import { ChoiceSelectionService } from "./ChoiceSelectionService";
 import { OptionSelectionService } from "./OptionSelectionService";
 
@@ -32,29 +32,42 @@ export class DefaultProductCustomizationService
       );
     }
 
-    return this.optionSelectionService
-      .selectOptions(product, options.optionIds)
-      .flatMap(() =>
-        this.applyConstraintsForAllOptions(product, options.optionIds)
-      )
-      .flatMap(() =>
-        this.choiceSelectionService.selectChoices(
-          product,
-          options.optionIds,
-          options.choiceIds
-        )
-      )
-      .map(() => product);
+    this.disableIncompatibleChoices(product, options);
+    this.choiceSelectionService.selectChoices(product, options);
+
+    return Result.success(product);
+  }
+
+  private disableIncompatibleChoices(
+    product: Product,
+    selectedOptions: SelectedOptions
+  ): void {
+    product.optionChoices.all
+      .flatMap((oc) => oc.constraints)
+      .filter((constraint) => constraint.type === "incompatible")
+      .forEach((constraint) => {
+        if (
+          selectedOptions.choiceIds.includes(constraint.constrainedByChoiceId)
+        ) {
+          const choice = product.optionChoices.findById(
+            constraint.optionChoiceId
+          );
+
+          if (choice) {
+            choice.disabled = true;
+          }
+        }
+      });
   }
 
   private applyConstraintsForAllOptions(
     product: Product,
-    optionIds: OptionId[]
+    optionIds: number[]
   ): Result<void> {
     for (const optionId of optionIds) {
       const constraints = product.optionChoices.all
         .flatMap((oc) => oc.constraints)
-        .filter((constraint) => constraint.constrainedBy === optionId.value);
+        .filter((constraint) => constraint.constrainedByChoiceId === optionId);
 
       if (constraints.length > 0) {
         const context = new ConstraintContext(
