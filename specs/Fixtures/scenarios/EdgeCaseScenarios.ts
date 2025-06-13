@@ -20,14 +20,14 @@ export class EdgeCaseScenarios {
     const cascadingConstraint1 = new ConstraintBuilder()
       .withId(1)
       .forChoice(402) // CASCADING_DISABLED_CHOICE_2_ID
-      .constrainedBy(7) // CASCADING_OPTION_1_ID
+      .constrainedByChoice(7) // CASCADING_OPTION_1_ID
       .asIncompatible()
       .build();
 
     const cascadingConstraint2 = new ConstraintBuilder()
       .withId(2)
       .forChoice(403) // CASCADING_DISABLED_CHOICE_3_ID
-      .constrainedBy(7) // CASCADING_OPTION_1_ID
+      .constrainedByChoice(7) // CASCADING_OPTION_1_ID
       .asIncompatible()
       .build();
 

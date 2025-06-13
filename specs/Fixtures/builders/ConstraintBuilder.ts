@@ -3,7 +3,7 @@ import { Constraint } from "../../../src/Store/Inventory/Core/Entities";
 export class ConstraintBuilder {
   private id: number = 1;
   private optionChoiceId: number = 101;
-  private constrainedByOption: number = 1;
+  private constrainedByChoiceId: number = 1;
   private type: "price" | "incompatible" = "incompatible";
   private priceAdjustment?: number;
 
@@ -17,8 +17,8 @@ export class ConstraintBuilder {
     return this;
   }
 
-  constrainedBy(optionId: number): ConstraintBuilder {
-    this.constrainedByOption = optionId;
+  constrainedByChoice(optionChoiceId: number): ConstraintBuilder {
+    this.constrainedByChoiceId = optionChoiceId;
     return this;
   }
 
@@ -38,7 +38,7 @@ export class ConstraintBuilder {
     const baseConstraint = {
       id: this.id,
       optionChoiceId: this.optionChoiceId,
-      constrainedBy: this.constrainedByOption,
+      constrainedByChoiceId: this.constrainedByChoiceId,
       type: this.type,
     };
 

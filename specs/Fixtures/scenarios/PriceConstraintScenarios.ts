@@ -10,7 +10,7 @@ export class PriceConstraintScenarios {
     const priceConstraint = new ConstraintBuilder()
       .withId(1)
       .forChoice(201) // PRICE_CONSTRAINED_CHOICE_ID
-      .constrainedBy(1) // OPTION_1_ID
+      .constrainedByChoice(1) // OPTION_1_ID
       .asPrice(15) // PRICE_CONSTRAINT_ADJUSTMENT
       .build();
 

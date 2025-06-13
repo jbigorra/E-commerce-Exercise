@@ -70,7 +70,7 @@ describe("Builder Pattern Demonstration", () => {
     const incompatibleConstraint = new ConstraintBuilder()
       .withId(1)
       .forChoice(ChoiceIds.RED_RIM)
-      .constrainedBy(OptionIds.WHEELS)
+      .constrainedByChoice(OptionIds.WHEELS)
       .asIncompatible()
       .build();
 

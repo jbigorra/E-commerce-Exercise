@@ -10,7 +10,7 @@ export class IncompatibleConstraintScenarios {
     const incompatibleConstraint = new ConstraintBuilder()
       .withId(1)
       .forChoice(5) // CONSTRAINED_OPTION_CHOICE_ID
-      .constrainedBy(1) // OPTION_1_ID
+      .constrainedByChoice(1) // OPTION_1_ID
       .asIncompatible()
       .build();
 
