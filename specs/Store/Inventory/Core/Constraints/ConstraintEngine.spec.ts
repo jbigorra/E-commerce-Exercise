@@ -3,8 +3,8 @@ import { ConstraintEngine } from "../../../../../src/Store/Inventory/Core/Constr
 import {
   Constraint,
   IncompatibleConstraint,
+  PartChoice,
   PriceConstraint,
-  ProductOptionChoice
 } from "../../../../../src/Store/Inventory/Core/Entities";
 import { Result } from "../../../../../src/Store/Inventory/Core/Result";
 import { MockConstraintHandler } from "./MockContraintHandler";
@@ -15,15 +15,16 @@ describe("ConstraintEngine", () => {
 
   beforeEach(() => {
     engine = new ConstraintEngine();
-    const optionChoices: ProductOptionChoice[] = [
+    const optionChoices: PartChoice[] = [
       {
         id: 101,
-        optionId: 1,
+        partId: 1,
         priceAdjustment: 5,
+        outOfStock: false,
         selected: false,
         disabled: false,
-        constraints: []
-      }
+        constraints: [],
+      },
     ];
     context = new ConstraintContext(optionChoices, 1);
   });
@@ -35,7 +36,7 @@ describe("ConstraintEngine", () => {
         id: 1,
         optionChoiceId: 101,
         constrainedBy: 1,
-        type: "unknown_type"
+        type: "unknown_type",
       } as any as Constraint;
 
       const result = engine.applyConstraints([unknownConstraint], context);
@@ -56,7 +57,7 @@ describe("ConstraintEngine", () => {
         optionChoiceId: 101,
         constrainedByChoiceId: 1,
         type: "price",
-        priceAdjustment: 5
+        priceAdjustment: 5,
       };
 
       const result = engine.applyConstraints([priceConstraint], context);
@@ -69,7 +70,7 @@ describe("ConstraintEngine", () => {
         id: 1,
         optionChoiceId: 101,
         constrainedByChoiceId: 1,
-        type: "incompatible"
+        type: "incompatible",
       };
 
       const result = engine.applyConstraints([incompatibleConstraint], context);
@@ -84,15 +85,16 @@ describe("ConstraintEngine", () => {
 
     beforeEach(() => {
       engine = new ConstraintEngine();
-      const optionChoices: ProductOptionChoice[] = [
+      const optionChoices: PartChoice[] = [
         {
           id: 101,
-          optionId: 1,
+          partId: 1,
           priceAdjustment: 5,
+          outOfStock: false,
           selected: false,
           disabled: false,
-          constraints: []
-        }
+          constraints: [],
+        },
       ];
       context = new ConstraintContext(optionChoices, 1);
       MockConstraintHandler.resetExecutionCounter();
@@ -110,20 +112,20 @@ describe("ConstraintEngine", () => {
           id: 1,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_c"
+          type: "type_c",
         } as any,
         {
           id: 2,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_a"
+          type: "type_a",
         } as any,
         {
           id: 3,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_b"
-        } as any
+          type: "type_b",
+        } as any,
       ];
 
       const result = engineWithMocks.applyConstraints(constraints, context);
@@ -147,26 +149,26 @@ describe("ConstraintEngine", () => {
           id: 1,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_a"
+          type: "type_a",
         } as any,
         {
           id: 2,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_a"
+          type: "type_a",
         } as any,
         {
           id: 3,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_b"
+          type: "type_b",
         } as any,
         {
           id: 4,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_c"
-        } as any
+          type: "type_c",
+        } as any,
       ];
 
       const result = engineWithMocks.applyConstraints(constraints, context);
@@ -190,20 +192,20 @@ describe("ConstraintEngine", () => {
           id: 1,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_c"
+          type: "type_c",
         } as any,
         {
           id: 2,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_a"
+          type: "type_a",
         } as any,
         {
           id: 3,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_b"
-        } as any
+          type: "type_b",
+        } as any,
       ];
 
       const result = engineWithMocks.applyConstraints(constraints, context);
@@ -220,7 +222,7 @@ describe("ConstraintEngine", () => {
         id: 1,
         optionChoiceId: 101,
         constrainedByChoiceId: 1,
-        type: "incompatible"
+        type: "incompatible",
       };
 
       const priceConstraint: PriceConstraint = {
@@ -228,7 +230,7 @@ describe("ConstraintEngine", () => {
         optionChoiceId: 101,
         constrainedByChoiceId: 1,
         type: "price",
-        priceAdjustment: 10
+        priceAdjustment: 10,
       };
 
       const result = engine.applyConstraints([priceConstraint, incompatibleConstraint], context);
@@ -258,14 +260,14 @@ describe("ConstraintEngine", () => {
           id: 1,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_fail"
+          type: "type_fail",
         } as any,
         {
           id: 2,
           optionChoiceId: 101,
           constrainedByChoiceId: 1,
-          type: "type_success"
-        } as any
+          type: "type_success",
+        } as any,
       ];
 
       const result = engineWithMocks.applyConstraints(constraints, context);

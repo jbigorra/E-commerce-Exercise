@@ -4,29 +4,23 @@ type Prettify<T> = {
 
 export type ProductType = "standard" | "customizable";
 
-export type Part = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  images: string[];
-};
-
 export type Inventory = {
   products: Product[];
   parts: Part[];
 };
 
-export type ProductOption = {
+export type Part = {
   id: number;
+  name: string;
+  description: string;
   price: number;
 };
 
-export type ProductOptionChoice = {
+export type PartChoice = {
   id: number;
-  optionId: number;
+  partId: number;
   priceAdjustment: number;
+  outOfStock: boolean;
   selected: boolean;
   disabled: boolean;
   constraints: Constraint[];
@@ -52,100 +46,70 @@ export type IncompatibleConstraint = Prettify<
   } & Constraint
 >;
 
-export class ProductOptions {
-  constructor(private readonly _list: ProductOption[]) {}
+export class Parts {
+  constructor(private readonly _list: Part[]) {}
 
   public get length(): number {
     return this._list.length;
   }
 
-  public get all(): ProductOption[] {
+  public get all(): Part[] {
     return this._list;
   }
 
-  public findById(id: number): ProductOption | undefined {
+  public findById(id: number): Part | undefined {
     return this._list.find((o) => o.id === id);
   }
 }
 
-export class ProductOptionChoices {
-  constructor(private readonly _list: ProductOptionChoice[]) {}
+export class PartChoices {
+  constructor(private readonly _list: PartChoice[]) {}
 
-  public get all(): ProductOptionChoice[] {
+  public get all(): PartChoice[] {
     return this._list;
   }
 
-  public findById(choiceId: number): ProductOptionChoice | undefined {
+  public findById(choiceId: number): PartChoice | undefined {
     return this._list.find((c) => c.id === choiceId);
   }
 
-  public findMatchingChoicesForOption(
-    optionId: number,
-    choiceIds: number[]
-  ): ProductOptionChoice[] {
-    return this._list
-      .filter((oc) => oc.optionId === optionId)
-      .filter((oc) => choiceIds.some((id) => id === oc.id));
+  public findMatchingChoicesForOption(optionId: number, choiceIds: number[]): PartChoice[] {
+    return this._list.filter((oc) => oc.partId === optionId).filter((oc) => choiceIds.some((id) => id === oc.id));
   }
 
-  public findByOptionId(optionId: number): ProductOptionChoice[] {
-    return this._list.filter((oc) => oc.optionId === optionId);
+  public findByOptionId(optionId: number): PartChoice[] {
+    return this._list.filter((oc) => oc.partId === optionId);
   }
 
   public calculateTotalPriceAdjustment(): number {
-    return this._list
-      .filter((oc) => oc.selected)
-      .reduce((acc, oc) => acc + oc.priceAdjustment, 0);
+    return this._list.filter((oc) => oc.selected).reduce((acc, oc) => acc + oc.priceAdjustment, 0);
   }
 
-  public get selected(): ProductOptionChoice[] {
+  public get selected(): PartChoice[] {
     return this._list.filter((oc) => oc.selected && !oc.disabled);
   }
 }
 
 export class Product {
-  private _options: ProductOptions;
-  private _optionChoices: ProductOptionChoices;
-
   constructor(
     readonly id: number,
     readonly type: ProductType,
     readonly basePrice: number,
-    options: ProductOptions,
-    optionChoices: ProductOptionChoices
-  ) {
-    this._options = options;
-    this._optionChoices = optionChoices;
-  }
+    readonly parts: Parts,
+    readonly partChoices: PartChoices,
+  ) {}
 
   public get currentTotalPrice(): number {
-    return (
-      this.basePrice +
-      this._optionChoices.calculateTotalPriceAdjustment() +
-      this.calculatePriceConstraints()
-    );
-  }
-
-  public get options(): ProductOptions {
-    return this._options;
-  }
-
-  public get optionChoices(): ProductOptionChoices {
-    return this._optionChoices;
+    return this.basePrice + this.partChoices.calculateTotalPriceAdjustment() + this.calculatePriceConstraints();
   }
 
   private calculatePriceConstraints(): number {
-    const selected = this._optionChoices.selected;
-    const constraints = selected
-      .flatMap((oc) => oc.constraints)
-      .filter((constraint) => constraint.type === "price");
+    const selected = this.partChoices.selected;
+    const constraints = selected.flatMap((oc) => oc.constraints).filter((constraint) => constraint.type === "price");
 
-    const sumByPriceConstraint = (
-      sum: number,
-      selectedChoice: ProductOptionChoice
-    ) => {
+    const sumByPriceConstraint = (sum: number, selectedChoice: PartChoice) => {
       const priceConstraints = constraints.filter(
-        (constraint) => constraint.constrainedByChoiceId === selectedChoice.id
+        (constraint) => constraint.constrainedByChoiceId === selectedChoice.id,
       ) as PriceConstraint[];
 
       if (priceConstraints.length > 0) {

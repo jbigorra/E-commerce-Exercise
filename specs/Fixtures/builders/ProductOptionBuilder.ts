@@ -17,6 +17,8 @@ export class ProductOptionBuilder {
   build(): Part {
     return {
       id: this.id,
+      name: `Part ${this.id} name`,
+      description: `Part ${this.id} description`,
       price: this.price,
     };
   }

@@ -2,15 +2,11 @@ import { Product } from "../../../src/Store/Inventory/Core/Entities";
 import { ProductBuilder } from "../builders/ProductBuilder";
 import { ProductOptionBuilder } from "../builders/ProductOptionBuilder";
 import { ProductOptionChoiceBuilder } from "../builders/ProductOptionChoiceBuilder";
-import { ChoiceIds, OptionIds } from "../constants/ProductConstants";
+import { ChoiceIds, PartIds } from "../constants/ProductConstants";
 
 export class BasicProductScenarios {
   static standardProduct(): Product {
-    return new ProductBuilder()
-      .withId(1)
-      .asStandard()
-      .withBasePrice(20)
-      .build();
+    return new ProductBuilder().withId(1).asStandard().withBasePrice(20).build();
   }
 
   static customizableProduct(): Product {
@@ -25,11 +21,7 @@ export class BasicProductScenarios {
   }
 
   static productsCollection(): Product[] {
-    return [
-      this.standardProduct(),
-      this.customizableProduct(),
-      this.customizableBikeProductWithoutConstraints(),
-    ];
+    return [this.standardProduct(), this.customizableProduct(), this.customizableBikeProductWithoutConstraints()];
   }
 
   // prettier-ignore-start
@@ -38,93 +30,87 @@ export class BasicProductScenarios {
       .withId(3)
       .asCustomizable()
       .withBasePrice(20)
-      .withOption(
-        new ProductOptionBuilder().withId(OptionIds.FRAME_TYPE).build()
-      )
+      .withOption(new ProductOptionBuilder().withId(PartIds.FRAME_TYPE).build())
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.FULL_SUSPENSION_FRAME)
-          .forOption(OptionIds.FRAME_TYPE)
+          .forOption(PartIds.FRAME_TYPE)
           .withPriceAdjustment(10)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.DIAMOND_FRAME)
-          .forOption(OptionIds.FRAME_TYPE)
+          .forOption(PartIds.FRAME_TYPE)
           .withPriceAdjustment(15)
-          .build()
+          .build(),
       )
-      .withOption(
-        new ProductOptionBuilder().withId(OptionIds.FRAME_FINISH).build()
-      )
+      .withOption(new ProductOptionBuilder().withId(PartIds.FRAME_FINISH).build())
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.MATTE_FINISH)
-          .forOption(OptionIds.FRAME_FINISH)
+          .forOption(PartIds.FRAME_FINISH)
           .withPriceAdjustment(20)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.SHINY_FINISH)
-          .forOption(OptionIds.FRAME_FINISH)
+          .forOption(PartIds.FRAME_FINISH)
           .withPriceAdjustment(25)
-          .build()
+          .build(),
       )
-      .withOption(new ProductOptionBuilder().withId(OptionIds.WHEELS).build())
+      .withOption(new ProductOptionBuilder().withId(PartIds.WHEELS).build())
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.ROAD_WHEELS)
-          .forOption(OptionIds.WHEELS)
+          .forOption(PartIds.WHEELS)
           .withPriceAdjustment(30)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.MOUNTAIN_WHEELS)
-          .forOption(OptionIds.WHEELS)
+          .forOption(PartIds.WHEELS)
           .withPriceAdjustment(35)
-          .build()
+          .build(),
       )
-      .withOption(new ProductOptionBuilder().withId(OptionIds.CHAIN).build())
+      .withOption(new ProductOptionBuilder().withId(PartIds.CHAIN).build())
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.SINGLE_SPEED_CHAIN)
-          .forOption(OptionIds.CHAIN)
+          .forOption(PartIds.CHAIN)
           .withPriceAdjustment(40)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.EIGHT_SPEED_CHAIN)
-          .forOption(OptionIds.CHAIN)
+          .forOption(PartIds.CHAIN)
           .withPriceAdjustment(45)
-          .build()
+          .build(),
       )
-      .withOption(
-        new ProductOptionBuilder().withId(OptionIds.RIM_COLOR).build()
-      )
+      .withOption(new ProductOptionBuilder().withId(PartIds.RIM_COLOR).build())
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.BLACK_RIM)
-          .forOption(OptionIds.RIM_COLOR)
+          .forOption(PartIds.RIM_COLOR)
           .withPriceAdjustment(50)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.BLUE_RIM)
-          .forOption(OptionIds.RIM_COLOR)
+          .forOption(PartIds.RIM_COLOR)
           .withPriceAdjustment(55)
-          .build()
+          .build(),
       )
       .withOptionChoice(
         new ProductOptionChoiceBuilder()
           .withId(ChoiceIds.RED_RIM)
-          .forOption(OptionIds.RIM_COLOR)
+          .forOption(PartIds.RIM_COLOR)
           .withPriceAdjustment(60)
-          .build()
+          .build(),
       )
       .build();
   }

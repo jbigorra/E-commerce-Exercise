@@ -22,12 +22,12 @@ export class DefaultProductCustomizationService implements ProductCustomizationS
   }
 
   private disableIncompatibleChoices(product: Product, selectedOptions: SelectedOptions): void {
-    product.optionChoices.all
+    product.partChoices.all
       .flatMap((oc) => oc.constraints)
       .filter((constraint) => constraint.type === "incompatible")
       .forEach((constraint) => {
         if (selectedOptions.choiceIds.includes(constraint.constrainedByChoiceId)) {
-          const choice = product.optionChoices.findById(constraint.optionChoiceId);
+          const choice = product.partChoices.findById(constraint.optionChoiceId);
 
           if (choice) {
             choice.disabled = true;

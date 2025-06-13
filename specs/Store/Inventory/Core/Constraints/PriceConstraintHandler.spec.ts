@@ -1,10 +1,6 @@
 import { ConstraintContext } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintContext";
 import { PriceConstraintHandler } from "../../../../../src/Store/Inventory/Core/Constraints/PriceConstraintHandler";
-import {
-  IncompatibleConstraint,
-  PriceConstraint,
-  ProductOptionChoice,
-} from "../../../../../src/Store/Inventory/Core/Entities";
+import { IncompatibleConstraint, PartChoice, PriceConstraint } from "../../../../../src/Store/Inventory/Core/Entities";
 
 describe("PriceConstraintHandler", () => {
   let handler: PriceConstraintHandler;
@@ -12,19 +8,21 @@ describe("PriceConstraintHandler", () => {
 
   beforeEach(() => {
     handler = new PriceConstraintHandler();
-    const optionChoices: ProductOptionChoice[] = [
+    const optionChoices: PartChoice[] = [
       {
         id: 101,
-        optionId: 1,
+        partId: 1,
         priceAdjustment: 5,
+        outOfStock: false,
         selected: false,
         disabled: false,
         constraints: [],
       },
       {
         id: 102,
-        optionId: 2,
+        partId: 2,
         priceAdjustment: 10,
+        outOfStock: false,
         selected: false,
         disabled: false,
         constraints: [],

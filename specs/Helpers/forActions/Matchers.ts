@@ -5,7 +5,7 @@ type Matcher<T = unknown> = T | ((actual: T) => void);
 
 export function expectSuccess<TResult>(
   obj: ActionResult<TResult>,
-  expectedProps?: Record<string, Matcher>
+  expectedProps?: Record<string, Matcher>,
 ): asserts obj is { result: TResult; error: undefined } {
   expect(obj.error).toBeUndefined();
   expect(obj.result).toBeDefined();
@@ -25,7 +25,7 @@ export function expectSuccess<TResult>(
 
 export function expectError<TResult>(
   obj: ActionResult<TResult>,
-  expectedMessage?: string
+  expectedMessage?: string,
 ): asserts obj is { result: undefined; error: Error } {
   expect(obj.error).toBeDefined();
   expect(obj.error).toBeInstanceOf(Error);

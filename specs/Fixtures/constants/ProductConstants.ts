@@ -5,7 +5,7 @@ export const ProductIds = {
   NON_EXISTENT: 999,
 } as const;
 
-export const OptionIds = {
+export const PartIds = {
   FRAME_TYPE: 1,
   FRAME_FINISH: 2,
   WHEELS: 3,

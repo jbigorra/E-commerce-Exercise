@@ -1,20 +1,9 @@
-import {
-  ViewProduct,
-  ViewProductCommand,
-} from "../../../src/Store/Inventory/Actions/ViewProduct";
-import {
-  Product,
-  ProductOptions,
-} from "../../../src/Store/Inventory/Core/Entities";
-import {
-  InMemoryInventory,
-  ProductRepository,
-} from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
+import { ProductDTO } from "../../../src/Store/Inventory/Actions/Dtos";
+import { ViewProduct, ViewProductCommand } from "../../../src/Store/Inventory/Actions/ViewProduct";
+import { Parts, Product } from "../../../src/Store/Inventory/Core/Entities";
+import { InMemoryInventory, ProductRepository } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
 import { IInventory } from "../../../src/Store/Inventory/Interfaces";
-import {
-  ProductIds,
-  TestScenarios,
-} from "../../Fixtures/constants/ProductConstants";
+import { ProductIds, TestScenarios } from "../../Fixtures/constants/ProductConstants";
 import { BasicProductScenarios } from "../../Fixtures/scenarios/BasicProductScenarios";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";
 
@@ -31,9 +20,7 @@ describe("ViewProduct", () => {
     it("should return an error if the product is not found", () => {
       const action = new ViewProduct(inventory);
 
-      const actionResult = action.execute(
-        new ViewProductCommand(TestScenarios.NOT_FOUND_PRODUCT)
-      );
+      const actionResult = action.execute(new ViewProductCommand(TestScenarios.NOT_FOUND_PRODUCT));
       expectError(actionResult, "Product not found");
     });
   });
@@ -42,29 +29,24 @@ describe("ViewProduct", () => {
     it("should return the standard product with empty available options", () => {
       const action = new ViewProduct(inventory);
 
-      const actionResult = action.execute(
-        new ViewProductCommand(ProductIds.STANDARD_PRODUCT)
-      );
+      const actionResult = action.execute(new ViewProductCommand(ProductIds.STANDARD_PRODUCT));
 
-      expectSuccess<Product>(actionResult, {
+      expectSuccess<ProductDTO>(actionResult, {
         id: ProductIds.STANDARD_PRODUCT,
         type: "standard",
-        options: (opts: ProductOptions) => expect(opts.length).toEqual(0),
+        parts: (parts: Parts) => expect(parts.length).toEqual(0),
       });
     });
 
     it("should return the customizable product with available options", () => {
       const action = new ViewProduct(inventory);
 
-      const actionResult = action.execute(
-        new ViewProductCommand(ProductIds.CUSTOMIZABLE_PRODUCT)
-      );
+      const actionResult = action.execute(new ViewProductCommand(ProductIds.CUSTOMIZABLE_PRODUCT));
 
-      expectSuccess<Product>(actionResult, {
+      expectSuccess<ProductDTO>(actionResult, {
         id: ProductIds.CUSTOMIZABLE_PRODUCT,
         type: "customizable",
-        options: (opts: ProductOptions) =>
-          expect(opts.length).toBeGreaterThanOrEqual(3),
+        parts: (parts: Parts) => expect(parts.length).toBeGreaterThanOrEqual(3),
       });
     });
 
@@ -79,19 +61,17 @@ describe("ViewProduct", () => {
         expectedType: "customizable" as const,
         expectedBasePrice: 20,
       },
-    ])(
-      "should return the product with the base price",
-      ({ id, expectedType, expectedBasePrice }) => {
-        const action = new ViewProduct(inventory);
+    ])("should return the product with the base price", ({ id, expectedType, expectedBasePrice }) => {
+      const action = new ViewProduct(inventory);
 
-        const actionResult = action.execute(new ViewProductCommand(id));
+      const actionResult = action.execute(new ViewProductCommand(id));
 
-        expectSuccess<Product>(actionResult, {
-          id,
-          type: expectedType,
-          basePrice: expectedBasePrice,
-        });
-      }
-    );
+      expectSuccess<ProductDTO>(actionResult, {
+        id,
+        type: expectedType,
+        basePrice: expectedBasePrice,
+        currentTotalPrice: expectedBasePrice,
+      });
+    });
   });
 });
