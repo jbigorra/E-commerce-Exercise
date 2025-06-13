@@ -57,8 +57,8 @@ In order to build a scalable and maintainable application as it is requested,we 
 
 To meet the criteria of the MVP the following key modules have been identified:
 
-- [CORE] **Product Catalog**: This module is for enable the search of products, displaying the product details, the options that can be configured and the manages the product configuration process which enforces the constraints and the price calculation.
-- [CORE] **Checkout**: This module is responsible for creating a BuyOrder which the Admin is informed about and can manually review and confirm/reject. Although not part of the MVP, it could eventually use 3rd party providers to validate/process payments, fraud detection mechanisms, etc.
+- [CORE] **Product Catalog**: This module is to enable the search of products, displaying the product details, parts and choices, and manages the product configuration process which enforces the constraints and the price calculation.
+- [CORE] **Checkout**: This module is responsible for creating an BuyOrder which the Admin is informed about and can manually review and confirm/reject. Although not part of the MVP, it could eventually use 3rd party providers to validate/process payments, fraud detection mechanisms, etc.
 - [SUPPORT] **Inventory**: This module is responsible for managing the inventory of the products, PartChoice, options , their constraints and stock state. Allows only the admin to manage it.
 - [SUPPORT] **Shopping Cart**: This module is responsible for creating a new ShoppingCart when the user adds a item to the cart. Enables the display of the contents of the cart.
 - [SUPPORT] **Users & Auth**: This module is responsible managing the creations of customers and admins, and the authentication of users.
@@ -102,6 +102,9 @@ src/
 │   │   ├── CRUD folders
 │   ├── Checkout/
 │   │   ├── Clean Architecture folders
+├── Shared/
+│   ├── EventBus/
+│   ├── Logging/
 ```
 Notes:
 - The `Core` folder contains domain objects and services and is where the business logic resides.
@@ -337,34 +340,6 @@ The product resource will contain all the necessary information to display the p
       ]
     }
   ],
-  "constraints": {
-    "compatibility": [
-      {
-        "id": 1,
-        "name": "Compatibility Constraint 1",
-        "part_choice_id": 1,
-        "constrainedByPartChoiceId": 2
-      }
-    ],
-    "price": [
-      {
-        "id": 1,
-        "name": "Price Constraint 1",
-        "description": "Price Constraint 1 description",
-        "partChoiceId": 2,
-        "constrainedByPartChoiceId": 1,
-        "priceAdjustment": 10
-      },
-      {
-        "id": 2,
-        "name": "Price Constraint 2",
-        "description": "Price Constraint 2 description",
-        "partChoiceId": 2,
-        "constrainedByPartChoiceId": 3,
-        "priceAdjustment": 15
-      }
-    ]
-  }
 }
 ```
 
