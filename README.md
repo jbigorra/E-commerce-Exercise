@@ -1,3 +1,13 @@
+# Running tests for the ProductCatalog View Product and Select Product Option cases
+
+```bash
+npm run test:jest
+
+# or 
+
+npm run test
+```
+
 # Technical Design Document
 
 ## Functional Requirements
