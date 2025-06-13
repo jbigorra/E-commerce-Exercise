@@ -1,10 +1,10 @@
-import { SelectProductOption } from "../../../../../../src/Store/Inventory/Actions/SelectProductOption";
-import { Product } from "../../../../../../src/Store/Inventory/Core/Entities";
+import { SelectProductOption } from "../../../../../../src/Store/ProductCatalog/Actions/SelectProductOption";
+import { Product } from "../../../../../../src/Store/ProductCatalog/Core/Entities";
 import {
   InMemoryInventory,
   ProductRepository,
-} from "../../../../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { IInventory } from "../../../../../../src/Store/Inventory/Interfaces";
+} from "../../../../../../src/Store/ProductCatalog/Infrastructure/InMemoryInventory";
+import { IInventory } from "../../../../../../src/Store/ProductCatalog/Interfaces";
 
 /**
  * Creates a test inventory with the provided products

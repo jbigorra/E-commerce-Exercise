@@ -1,8 +1,8 @@
 import { mock } from "jest-mock-extended";
-import { SelectProductOptionCommand } from "../../../../../src/Store/Inventory/Actions/SelectProductOption";
-import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
-import { InMemoryInventory } from "../../../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { IInventory, IProductRepository } from "../../../../../src/Store/Inventory/Interfaces";
+import { SelectProductOptionCommand } from "../../../../../src/Store/ProductCatalog/Actions/SelectProductOption";
+import { Product } from "../../../../../src/Store/ProductCatalog/Core/Entities";
+import { InMemoryInventory } from "../../../../../src/Store/ProductCatalog/Infrastructure/InMemoryInventory";
+import { IInventory, IProductRepository } from "../../../../../src/Store/ProductCatalog/Interfaces";
 import { PartIds, ProductIds, TestScenarios } from "../../../../Fixtures/constants/ProductConstants";
 import { BasicProductScenarios } from "../../../../Fixtures/scenarios/BasicProductScenarios";
 import { expectError } from "../../../../Helpers/forActions/Matchers";

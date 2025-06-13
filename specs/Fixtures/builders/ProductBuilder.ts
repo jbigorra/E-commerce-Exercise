@@ -1,4 +1,11 @@
-import { Part, PartChoice, PartChoices, Parts, Product, ProductType } from "../../../src/Store/Inventory/Core/Entities";
+import {
+  Part,
+  PartChoice,
+  PartChoices,
+  Parts,
+  Product,
+  ProductType,
+} from "../../../src/Store/ProductCatalog/Core/Entities";
 
 export class ProductBuilder {
   private id: number = 1;

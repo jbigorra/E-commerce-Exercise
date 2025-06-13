@@ -1,7 +1,7 @@
-import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
-import { ProductCustomizationService } from "../../../../../src/Store/Inventory/Core/Services/ProductCustomizationService";
-import { ServiceFactory } from "../../../../../src/Store/Inventory/Core/Services/ServiceFactory";
-import { SelectedOptions } from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import { Product } from "../../../../../src/Store/ProductCatalog/Core/Entities";
+import { ProductCustomizationService } from "../../../../../src/Store/ProductCatalog/Core/Services/ProductCustomizationService";
+import { ServiceFactory } from "../../../../../src/Store/ProductCatalog/Core/Services/ServiceFactory";
+import { SelectedOptions } from "../../../../../src/Store/ProductCatalog/Core/ValueObjects";
 import { ConstraintBuilder } from "../../../../Fixtures/builders/ConstraintBuilder";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
 import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";

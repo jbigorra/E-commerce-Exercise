@@ -1,4 +1,4 @@
-import { Result } from "../../../../src/Store/Inventory/Core/Result";
+import { Result } from "../../../../src/Store/ProductCatalog/Core/Result";
 
 describe("Result", () => {
   describe("Success", () => {

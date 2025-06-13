@@ -1,4 +1,4 @@
-import { Product } from "../../../src/Store/Inventory/Core/Entities";
+import { Product } from "../../../src/Store/ProductCatalog/Core/Entities";
 import { ProductBuilder } from "../builders/ProductBuilder";
 import { ProductOptionBuilder } from "../builders/ProductOptionBuilder";
 import { ProductOptionChoiceBuilder } from "../builders/ProductOptionChoiceBuilder";

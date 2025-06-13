@@ -1,12 +1,12 @@
-import { ConstraintContext } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintContext";
-import { ConstraintEngine } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintEngine";
+import { ConstraintContext } from "../../../../../src/Store/ProductCatalog/Core/Constraints/ConstraintContext";
+import { ConstraintEngine } from "../../../../../src/Store/ProductCatalog/Core/Constraints/ConstraintEngine";
 import {
   Constraint,
   IncompatibleConstraint,
   PartChoice,
   PriceConstraint,
-} from "../../../../../src/Store/Inventory/Core/Entities";
-import { Result } from "../../../../../src/Store/Inventory/Core/Result";
+} from "../../../../../src/Store/ProductCatalog/Core/Entities";
+import { Result } from "../../../../../src/Store/ProductCatalog/Core/Result";
 import { MockConstraintHandler } from "./MockContraintHandler";
 
 describe("ConstraintEngine", () => {

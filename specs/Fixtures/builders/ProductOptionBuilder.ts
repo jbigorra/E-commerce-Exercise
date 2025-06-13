@@ -1,4 +1,4 @@
-import { Part } from "../../../src/Store/Inventory/Core/Entities";
+import { Part } from "../../../src/Store/ProductCatalog/Core/Entities";
 
 export class ProductOptionBuilder {
   private id: number = 1;

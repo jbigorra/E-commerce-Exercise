@@ -1,6 +1,10 @@
-import { ConstraintContext } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintContext";
-import { PriceConstraintHandler } from "../../../../../src/Store/Inventory/Core/Constraints/PriceConstraintHandler";
-import { IncompatibleConstraint, PartChoice, PriceConstraint } from "../../../../../src/Store/Inventory/Core/Entities";
+import { ConstraintContext } from "../../../../../src/Store/ProductCatalog/Core/Constraints/ConstraintContext";
+import { PriceConstraintHandler } from "../../../../../src/Store/ProductCatalog/Core/Constraints/PriceConstraintHandler";
+import {
+  IncompatibleConstraint,
+  PartChoice,
+  PriceConstraint,
+} from "../../../../../src/Store/ProductCatalog/Core/Entities";
 
 describe("PriceConstraintHandler", () => {
   let handler: PriceConstraintHandler;

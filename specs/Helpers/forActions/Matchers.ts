@@ -1,5 +1,5 @@
 import { expect } from "@jest/globals";
-import { ActionResult } from "../../../src/Store/Inventory/Actions/Action";
+import { ActionResult } from "../../../src/Store/ProductCatalog/Actions/Action";
 
 type Matcher<T = unknown> = T | ((actual: T) => void);
 

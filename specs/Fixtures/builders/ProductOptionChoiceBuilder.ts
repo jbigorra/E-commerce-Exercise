@@ -1,4 +1,4 @@
-import { Constraint, PartChoice } from "../../../src/Store/Inventory/Core/Entities";
+import { Constraint, PartChoice } from "../../../src/Store/ProductCatalog/Core/Entities";
 
 export class ProductOptionChoiceBuilder {
   private id: number = 101;

@@ -1,6 +1,6 @@
-import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
-import { ChoiceSelectionService } from "../../../../../src/Store/Inventory/Core/Services/ChoiceSelectionService";
-import { SelectedOptions } from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import { Product } from "../../../../../src/Store/ProductCatalog/Core/Entities";
+import { ChoiceSelectionService } from "../../../../../src/Store/ProductCatalog/Core/Services/ChoiceSelectionService";
+import { SelectedOptions } from "../../../../../src/Store/ProductCatalog/Core/ValueObjects";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
 import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";
 import { ProductOptionChoiceBuilder } from "../../../../Fixtures/builders/ProductOptionChoiceBuilder";

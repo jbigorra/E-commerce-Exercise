@@ -1,4 +1,4 @@
-import { Constraint } from "../../../src/Store/Inventory/Core/Entities";
+import { Constraint } from "../../../src/Store/ProductCatalog/Core/Entities";
 
 export class ConstraintBuilder {
   private id: number = 1;

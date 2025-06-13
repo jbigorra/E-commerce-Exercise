@@ -1,7 +1,7 @@
-import { PartChoiceDTO, ProductDTO } from "../../../../../src/Store/Inventory/Actions/Dtos";
-import { SelectProductOptionCommand } from "../../../../../src/Store/Inventory/Actions/SelectProductOption";
-import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
-import { IInventory } from "../../../../../src/Store/Inventory/Interfaces";
+import { PartChoiceDTO, ProductDTO } from "../../../../../src/Store/ProductCatalog/Actions/Dtos";
+import { SelectProductOptionCommand } from "../../../../../src/Store/ProductCatalog/Actions/SelectProductOption";
+import { Product } from "../../../../../src/Store/ProductCatalog/Core/Entities";
+import { IInventory } from "../../../../../src/Store/ProductCatalog/Interfaces";
 import { ChoiceIds, PartIds } from "../../../../Fixtures/constants/ProductConstants";
 import { BasicProductScenarios } from "../../../../Fixtures/scenarios/BasicProductScenarios";
 import { expectSuccess } from "../../../../Helpers/forActions/Matchers";

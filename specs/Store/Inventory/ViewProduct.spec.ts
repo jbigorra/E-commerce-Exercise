@@ -1,8 +1,11 @@
-import { ProductDTO } from "../../../src/Store/Inventory/Actions/Dtos";
-import { ViewProduct, ViewProductCommand } from "../../../src/Store/Inventory/Actions/ViewProduct";
-import { Parts, Product } from "../../../src/Store/Inventory/Core/Entities";
-import { InMemoryInventory, ProductRepository } from "../../../src/Store/Inventory/Infrastructure/InMemoryInventory";
-import { IInventory } from "../../../src/Store/Inventory/Interfaces";
+import { ProductDTO } from "../../../src/Store/ProductCatalog/Actions/Dtos";
+import { ViewProduct, ViewProductCommand } from "../../../src/Store/ProductCatalog/Actions/ViewProduct";
+import { Parts, Product } from "../../../src/Store/ProductCatalog/Core/Entities";
+import {
+  InMemoryInventory,
+  ProductRepository,
+} from "../../../src/Store/ProductCatalog/Infrastructure/InMemoryInventory";
+import { IInventory } from "../../../src/Store/ProductCatalog/Interfaces";
 import { ProductIds, TestScenarios } from "../../Fixtures/constants/ProductConstants";
 import { BasicProductScenarios } from "../../Fixtures/scenarios/BasicProductScenarios";
 import { expectError, expectSuccess } from "../../Helpers/forActions/Matchers";

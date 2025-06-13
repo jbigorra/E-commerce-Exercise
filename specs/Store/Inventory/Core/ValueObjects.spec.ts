@@ -1,4 +1,4 @@
-import { SelectedOptions } from "../../../../src/Store/Inventory/Core/ValueObjects";
+import { SelectedOptions } from "../../../../src/Store/ProductCatalog/Core/ValueObjects";
 
 describe("ValueObjects", () => {
   describe("SelectedOptions", () => {
@@ -6,25 +6,19 @@ describe("ValueObjects", () => {
       it("should throw error when no parts are provided", () => {
         expect(() => {
           new SelectedOptions([], [101, 102]);
-        }).toThrow(
-          "At least one product part must be selected to customize the product"
-        );
+        }).toThrow("At least one product part must be selected to customize the product");
       });
 
       it("should throw error when no part choices are provided", () => {
         expect(() => {
           new SelectedOptions([1, 2], []);
-        }).toThrow(
-          "At least one product part choice must be selected to customize the product"
-        );
+        }).toThrow("At least one product part choice must be selected to customize the product");
       });
 
       it("should throw error when both parts and part choices are empty", () => {
         expect(() => {
           new SelectedOptions([], []);
-        }).toThrow(
-          "At least one product part must be selected to customize the product"
-        );
+        }).toThrow("At least one product part must be selected to customize the product");
       });
 
       it("should throw error when duplicate part choices are provided", () => {
