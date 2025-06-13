@@ -1,15 +1,11 @@
 import { ConstraintEngine } from "../Constraints/ConstraintEngine";
 import { ChoiceSelectionService } from "./ChoiceSelectionService";
-import {
-  DefaultProductCustomizationService,
-  ProductCustomizationService,
-} from "./ProductCustomizationService";
+import { DefaultProductCustomizationService, ProductCustomizationService } from "./ProductCustomizationService";
 
 export class ServiceFactory {
   private static choiceSelectionService: ChoiceSelectionService | null = null;
   private static constraintEngine: ConstraintEngine | null = null;
-  private static productCustomizationService: ProductCustomizationService | null =
-    null;
+  private static productCustomizationService: ProductCustomizationService | null = null;
 
   static createProductCustomizationService(): ProductCustomizationService {
     if (!this.productCustomizationService) {
