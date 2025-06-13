@@ -280,14 +280,14 @@ The product resource will contain all the necessary information to display the p
   "type": "customizable",
   "description": "Product 1 description",
   "basePrice": 100,
-  "current_total_price": 1000,
+  "currentTotalPrice": 1000,
   "parts": [
     {
       "id": 1,
       "name": "Part 1",
       "description": "Part 1 description",
       "price": 100,
-      "display_order": 1,
+      "displayOrder": 1,
       "partChoices": [
         {
           "id": 1,
@@ -314,7 +314,7 @@ The product resource will contain all the necessary information to display the p
       "name": "Part 2",
       "description": "Part 2 description",
       "price": 200,
-      "display_order": 2,
+      "displayOrder": 2,
       "partChoices": [
         {
           "id": 3,
@@ -343,7 +343,7 @@ The product resource will contain all the necessary information to display the p
         "id": 1,
         "name": "Compatibility Constraint 1",
         "part_choice_id": 1,
-        "constrained_by_part_choice_id": 2
+        "constrainedByPartChoiceId": 2
       }
     ],
     "price": [
@@ -351,17 +351,17 @@ The product resource will contain all the necessary information to display the p
         "id": 1,
         "name": "Price Constraint 1",
         "description": "Price Constraint 1 description",
-        "part_choice_id": 2,
-        "constrained_by_part_choice_id": 1,
-        "price_adjustment": 10
+        "partChoiceId": 2,
+        "constrainedByPartChoiceId": 1,
+        "priceAdjustment": 10
       },
       {
         "id": 2,
         "name": "Price Constraint 2",
         "description": "Price Constraint 2 description",
-        "part_choice_id": 2,
-        "constrained_by_part_choice_id": 3,
-        "price_adjustment": 15
+        "partChoiceId": 2,
+        "constrainedByPartChoiceId": 3,
+        "priceAdjustment": 15
       }
     ]
   }
@@ -369,11 +369,11 @@ The product resource will contain all the necessary information to display the p
 ```
 
 1. Some fields are excluded from the response to avoid unnecessary data for the Customer and other fields like Selected and Disabled are calculated in runtime by the backend and returned to the client application to avoid applying domain business rules in the frontend.
-2. The current_total_price is calculated by the backend and returned to the client application to avoid applying domain business rules in the frontend. It is calculated by gathering the selected part_choices and adding the product base_price + the part_choice.price and the price_constraint.price_adjustment (if applicable).
-3. The display_order is used to sort the parts in the UI.
+2. The currentTotalPrice is calculated by the backend and returned to the client application to avoid applying domain business rules in the frontend. It is calculated by gathering the selected part_choices and adding the product base_price + the part_choice.price and the price_constraint.price_adjustment (if applicable).
+3. The displayOrder is used to sort the parts in the UI.
 4. The selected field is used to indicate if the part_choice is selected by the Customer.
 5. The disabled field is used to indicate if the part_choice is disabled by the system due to a compatibility constraint applied by a previously selected part_choice.
-6. The backend expects the client to send previously selected part_choices + the new part_choice to be selected. The client will review and apply constraints again to all part_choices to calculate the current_total_price.
+6. The backend expects the client to send previously selected part_choices + the new part_choice to be selected. The client will review and apply constraints again to all part_choices to calculate the currentTotalPrice.
    1. The incompatibility constraints are always applied first by the backend to disable them before attempting to apply the price constraints.
 7. The data used to build the product resource is retrieved from the database by using views to optimize performance and decouple from the implementation details of the original tables.
    1. If the number of products and part_choices increase drastically, the views could be replaced by a read model to optimize performance which uses a more performant database able to handle heavy read operations. But initially it is not expected to be a problem and there is only one type of product (bikes) and the number of part_choices is expected to be low.
@@ -543,8 +543,8 @@ If it is a new "customizable" product then:
   - outOfStock
   - published
   - tags
-- IncompatibilityConstraints[] (optional)
-- PriceConstraints[] (optional)
+  - incompatibleConstraints[] (optional)
+  - priceConstraints[] (optional)
 
 How does the database change?
 
