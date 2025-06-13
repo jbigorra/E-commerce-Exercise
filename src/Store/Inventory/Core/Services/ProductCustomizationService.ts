@@ -4,7 +4,6 @@ import { Product } from "../Entities";
 import { Result } from "../Result";
 import { SelectedOptions } from "../ValueObjects";
 import { ChoiceSelectionService } from "./ChoiceSelectionService";
-import { OptionSelectionService } from "./OptionSelectionService";
 
 export interface ProductCustomizationService {
   customize(product: Product, options: SelectedOptions): Result<Product>;
@@ -14,7 +13,6 @@ export class DefaultProductCustomizationService
   implements ProductCustomizationService
 {
   constructor(
-    private readonly optionSelectionService: OptionSelectionService,
     private readonly choiceSelectionService: ChoiceSelectionService,
     private readonly constraintEngine: ConstraintEngine
   ) {}

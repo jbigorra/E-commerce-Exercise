@@ -1,11 +1,6 @@
-import { ConstraintEngine } from "../../../../../src/Store/Inventory/Core/Constraints/ConstraintEngine";
 import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
-import { ChoiceSelectionService } from "../../../../../src/Store/Inventory/Core/Services/ChoiceSelectionService";
-import { OptionSelectionService } from "../../../../../src/Store/Inventory/Core/Services/OptionSelectionService";
-import {
-  DefaultProductCustomizationService,
-  ProductCustomizationService,
-} from "../../../../../src/Store/Inventory/Core/Services/ProductCustomizationService";
+import { ProductCustomizationService } from "../../../../../src/Store/Inventory/Core/Services/ProductCustomizationService";
+import { ServiceFactory } from "../../../../../src/Store/Inventory/Core/Services/ServiceFactory";
 import { SelectedOptions } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 import { ConstraintBuilder } from "../../../../Fixtures/builders/ConstraintBuilder";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
@@ -22,15 +17,8 @@ describe("ProductCustomizationService", () => {
   let product: Product;
 
   beforeEach(() => {
-    const optionSelectionService = new OptionSelectionService();
-    const choiceSelectionService = new ChoiceSelectionService();
-    const constraintEngine = new ConstraintEngine();
-
-    service = new DefaultProductCustomizationService(
-      optionSelectionService,
-      choiceSelectionService,
-      constraintEngine
-    );
+    ServiceFactory.reset();
+    service = ServiceFactory.createProductCustomizationService();
 
     const FRAME_TYPE = new ProductOptionBuilder()
       .withId(OptionIds.FRAME_TYPE)
