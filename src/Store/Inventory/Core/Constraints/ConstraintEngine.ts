@@ -2,10 +2,12 @@ import { Constraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
 import { IncompatibleConstraintHandler } from "./IncompatibleConstraintHandler";
-import { ConstraintStrategy } from "./Interfaces";
+import { PriorityConstraintStrategy } from "./Interfaces";
 import { PriceConstraintHandler } from "./PriceConstraintHandler";
 
-class DefaultConstraintHandler implements ConstraintStrategy {
+class DefaultConstraintHandler implements PriorityConstraintStrategy {
+  priority: number = Number.MAX_SAFE_INTEGER;
+
   canHandle(constraint: Constraint): constraint is Constraint {
     return true;
   }
@@ -18,28 +20,40 @@ class DefaultConstraintHandler implements ConstraintStrategy {
 }
 
 export class ConstraintEngine {
-  private readonly defaultHandler: ConstraintStrategy =
+  readonly defaultHandler: PriorityConstraintStrategy =
     new DefaultConstraintHandler();
+  private readonly sortedHandlers: PriorityConstraintStrategy<Constraint>[];
 
   constructor(
-    private readonly handlers: ConstraintStrategy[] = [
+    readonly handlers: PriorityConstraintStrategy[] = [
       new IncompatibleConstraintHandler(),
       new PriceConstraintHandler(),
     ]
-  ) {}
+  ) {
+    this.sortedHandlers = this.handlers.sort((a, b) => a.priority - b.priority);
+  }
 
   applyConstraints(
     constraints: Constraint[],
     context: ConstraintContext
   ): Result<void> {
-    for (const constraint of constraints) {
-      const handler =
-        this.handlers.find((h: ConstraintStrategy<typeof constraint>) =>
-          h.canHandle(constraint)
-        ) ?? this.defaultHandler;
+    for (const handler of this.sortedHandlers) {
+      const applicableConstraints = constraints.filter((c) =>
+        handler.canHandle(c)
+      );
 
-      const result = handler.apply(constraint, context);
+      for (const constraint of applicableConstraints) {
+        const result = handler.apply(constraint, context);
+        if (result.isError()) return result;
+      }
+    }
 
+    const unhandledConstraints = constraints.filter(
+      (c) => !this.sortedHandlers.some((h) => h.canHandle(c))
+    );
+
+    for (const constraint of unhandledConstraints) {
+      const result = this.defaultHandler.apply(constraint, context);
       if (result.isError()) return result;
     }
 

@@ -6,3 +6,8 @@ export interface ConstraintStrategy<T extends Constraint = Constraint> {
   canHandle(constraint: Constraint): constraint is T;
   apply(constraint: T, context: ConstraintContext): Result<void>;
 }
+
+export interface PriorityConstraintStrategy<T extends Constraint = Constraint>
+  extends ConstraintStrategy<T> {
+  readonly priority: number;
+}

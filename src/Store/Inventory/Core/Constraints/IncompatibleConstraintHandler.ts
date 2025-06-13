@@ -1,11 +1,13 @@
 import { Constraint, IncompatibleConstraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
-import { ConstraintStrategy } from "./Interfaces";
+import { PriorityConstraintStrategy } from "./Interfaces";
 
 export class IncompatibleConstraintHandler
-  implements ConstraintStrategy<IncompatibleConstraint>
+  implements PriorityConstraintStrategy<IncompatibleConstraint>
 {
+  readonly priority: number = 0;
+
   canHandle(constraint: Constraint): constraint is IncompatibleConstraint {
     return constraint.type === "incompatible";
   }

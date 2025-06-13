@@ -1,11 +1,13 @@
 import { Constraint, PriceConstraint } from "../Entities";
 import { Result } from "../Result";
 import { ConstraintContext } from "./ConstraintContext";
-import { ConstraintStrategy } from "./Interfaces";
+import { PriorityConstraintStrategy } from "./Interfaces";
 
 export class PriceConstraintHandler
-  implements ConstraintStrategy<PriceConstraint>
+  implements PriorityConstraintStrategy<PriceConstraint>
 {
+  readonly priority: number = 1;
+
   canHandle(constraint: Constraint): constraint is PriceConstraint {
     return constraint.type === "price";
   }
