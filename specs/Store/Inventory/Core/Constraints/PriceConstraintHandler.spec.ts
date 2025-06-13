@@ -5,7 +5,6 @@ import {
   PriceConstraint,
   ProductOptionChoice,
 } from "../../../../../src/Store/Inventory/Core/Entities";
-import { OptionId } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 
 describe("PriceConstraintHandler", () => {
   let handler: PriceConstraintHandler;
@@ -31,7 +30,7 @@ describe("PriceConstraintHandler", () => {
         constraints: [],
       },
     ];
-    context = new ConstraintContext(optionChoices, new OptionId(1));
+    context = new ConstraintContext(optionChoices, 1);
   });
 
   describe("canHandle", () => {
@@ -39,7 +38,7 @@ describe("PriceConstraintHandler", () => {
       const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "price",
         priceAdjustment: 5,
       };
@@ -51,7 +50,7 @@ describe("PriceConstraintHandler", () => {
       const incompatibleConstraint: IncompatibleConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "incompatible",
       };
 
@@ -64,7 +63,7 @@ describe("PriceConstraintHandler", () => {
       const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "price",
         priceAdjustment: 5,
       };
@@ -78,7 +77,7 @@ describe("PriceConstraintHandler", () => {
       const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 2, // Different from context's selectedOptionId
+        constrainedByChoiceId: 2, // Different from context's selectedOptionId
         type: "price",
         priceAdjustment: 5,
       };
@@ -92,7 +91,7 @@ describe("PriceConstraintHandler", () => {
       const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 999, // Non-existent choice
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "price",
         priceAdjustment: 5,
       };

@@ -1,18 +1,17 @@
 import { Product } from "../Entities";
 import { Result } from "../Result";
-import { ChoiceId, OptionId } from "../ValueObjects";
+import { SelectedOptions } from "../ValueObjects";
 
 export class ChoiceSelectionService {
   selectChoices(
     product: Product,
-    optionIds: OptionId[],
-    choiceIds: ChoiceId[]
+    selectedOptions: SelectedOptions
   ): Result<void> {
-    for (const optionId of optionIds) {
+    for (const optionId of selectedOptions.optionIds) {
       const choicesToSelect =
         product.optionChoices.findMatchingChoicesForOption(
-          optionId.value,
-          choiceIds.map((c) => c.value)
+          optionId,
+          selectedOptions.choiceIds
         );
 
       if (choicesToSelect.length > 1) {

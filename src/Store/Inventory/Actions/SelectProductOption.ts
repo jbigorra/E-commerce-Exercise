@@ -1,6 +1,6 @@
 import { Product } from "../Core/Entities";
 import { ServiceFactory } from "../Core/Services/ServiceFactory";
-import { ChoiceId, OptionId, SelectedOptions } from "../Core/ValueObjects";
+import { SelectedOptions } from "../Core/ValueObjects";
 import { IInventory } from "../Interfaces";
 import { ActionResult, Application } from "./Action";
 
@@ -24,8 +24,8 @@ export class SelectProductOption {
     if (!product) return Application.error(new Error("Product not found"));
 
     const selectedOptions = new SelectedOptions(
-      command.optionIds.map((id) => new OptionId(id)),
-      command.optionChoicesIds.map((id) => new ChoiceId(id))
+      command.optionIds,
+      command.optionChoicesIds
     );
 
     const result = this.customizationService.customize(

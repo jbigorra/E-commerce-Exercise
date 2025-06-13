@@ -1,6 +1,5 @@
 import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
 import { OptionSelectionService } from "../../../../../src/Store/Inventory/Core/Services/OptionSelectionService";
-import { OptionId } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
 import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";
 import {
@@ -42,10 +41,7 @@ describe("OptionSelectionService", () => {
   describe("selectOptions", () => {
     it("should select valid options", () => {
       // Arrange
-      const optionIds = [
-        new OptionId(OptionIds.FRAME_TYPE),
-        new OptionId(OptionIds.WHEELS),
-      ];
+      const optionIds = [OptionIds.FRAME_TYPE, OptionIds.WHEELS];
 
       // Act
       const result = service.selectOptions(product, optionIds);
@@ -63,7 +59,7 @@ describe("OptionSelectionService", () => {
 
     it("should return error for invalid option ID", () => {
       // Arrange
-      const optionIds = [new OptionId(TestScenarios.UNAVAILABLE_OPTION)];
+      const optionIds = [TestScenarios.UNAVAILABLE_OPTION];
 
       // Act
       const result = service.selectOptions(product, optionIds);
@@ -77,7 +73,7 @@ describe("OptionSelectionService", () => {
 
     it("should handle empty option array", () => {
       // Arrange
-      const optionIds: OptionId[] = [];
+      const optionIds: number[] = [];
 
       // Act
       const result = service.selectOptions(product, optionIds);

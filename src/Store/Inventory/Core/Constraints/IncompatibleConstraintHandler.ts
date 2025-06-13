@@ -14,7 +14,7 @@ export class IncompatibleConstraintHandler
     constraint: IncompatibleConstraint,
     context: ConstraintContext
   ): Result<void> {
-    if (constraint.constrainedBy === context.selectedOptionId.value) {
+    if (constraint.constrainedByChoiceId === context.selectedOptionId) {
       const choice = context.findChoiceById(constraint.optionChoiceId);
 
       if (choice) {

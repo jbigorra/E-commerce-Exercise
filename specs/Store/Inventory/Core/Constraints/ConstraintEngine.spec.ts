@@ -6,7 +6,6 @@ import {
   PriceConstraint,
   ProductOptionChoice,
 } from "../../../../../src/Store/Inventory/Core/Entities";
-import { OptionId } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 
 describe("ConstraintEngine", () => {
   let engine: ConstraintEngine;
@@ -24,7 +23,7 @@ describe("ConstraintEngine", () => {
         constraints: [],
       },
     ];
-    context = new ConstraintContext(optionChoices, new OptionId(1));
+    context = new ConstraintContext(optionChoices, 1);
   });
 
   describe("applyConstraints", () => {
@@ -55,7 +54,7 @@ describe("ConstraintEngine", () => {
       const priceConstraint: PriceConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "price",
         priceAdjustment: 5,
       };
@@ -69,7 +68,7 @@ describe("ConstraintEngine", () => {
       const incompatibleConstraint: IncompatibleConstraint = {
         id: 1,
         optionChoiceId: 101,
-        constrainedBy: 1,
+        constrainedByChoiceId: 1,
         type: "incompatible",
       };
 

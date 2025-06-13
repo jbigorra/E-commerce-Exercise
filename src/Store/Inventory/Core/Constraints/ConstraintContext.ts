@@ -1,10 +1,9 @@
 import { ProductOptionChoice } from "../Entities";
-import { OptionId } from "../ValueObjects";
 
 export class ConstraintContext {
   constructor(
     public readonly optionChoices: ProductOptionChoice[],
-    public readonly selectedOptionId: OptionId
+    public readonly selectedOptionId: number
   ) {}
 
   findChoiceById(choiceId: number): ProductOptionChoice | undefined {

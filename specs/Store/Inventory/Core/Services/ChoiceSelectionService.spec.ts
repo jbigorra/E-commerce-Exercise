@@ -63,8 +63,8 @@ describe("ChoiceSelectionService", () => {
 
   describe("selectChoices", () => {
     it("should select valid choices", () => {
-      const optionIds = [new OptionId(OptionIds.FRAME_TYPE)];
-      const choiceIds = [new ChoiceId(ChoiceIds.FULL_SUSPENSION_FRAME)];
+      const optionIds = [OptionIds.FRAME_TYPE)];
+      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME)];
 
       const result = service.selectChoices(product, optionIds, choiceIds);
 
@@ -76,10 +76,10 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should reject multiple choices for same option", () => {
-      const optionIds = [new OptionId(OptionIds.FRAME_TYPE)];
+      const optionIds = [OptionIds.FRAME_TYPE)];
       const choiceIds = [
-        new ChoiceId(ChoiceIds.FULL_SUSPENSION_FRAME),
-        new ChoiceId(ChoiceIds.DIAMOND_FRAME),
+        ChoiceIds.FULL_SUSPENSION_FRAME),
+        ChoiceIds.DIAMOND_FRAME),
       ];
 
       const result = service.selectChoices(product, optionIds, choiceIds);
@@ -97,8 +97,8 @@ describe("ChoiceSelectionService", () => {
       );
       choiceToDisable!.disabled = true;
 
-      const optionIds = [new OptionId(OptionIds.FRAME_TYPE)];
-      const choiceIds = [new ChoiceId(ChoiceIds.FULL_SUSPENSION_FRAME)];
+      const optionIds = [OptionIds.FRAME_TYPE)];
+      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME)];
 
       const result = service.selectChoices(product, optionIds, choiceIds);
 
@@ -109,8 +109,8 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should handle options with no matching choices", () => {
-      const optionIds = [new OptionId(OptionIds.FRAME_TYPE)];
-      const choiceIds = [new ChoiceId(999)]; // Non-existent choice
+      const optionIds = [OptionIds.FRAME_TYPE)];
+      const choiceIds = [999)]; // Non-existent choice
 
       const result = service.selectChoices(product, optionIds, choiceIds);
 
