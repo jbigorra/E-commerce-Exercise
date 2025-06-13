@@ -1,9 +1,6 @@
 import { Product } from "../../../../../src/Store/Inventory/Core/Entities";
 import { ChoiceSelectionService } from "../../../../../src/Store/Inventory/Core/Services/ChoiceSelectionService";
-import {
-  ChoiceId,
-  OptionId,
-} from "../../../../../src/Store/Inventory/Core/ValueObjects";
+import { SelectedOptions } from "../../../../../src/Store/Inventory/Core/ValueObjects";
 import { ProductBuilder } from "../../../../Fixtures/builders/ProductBuilder";
 import { ProductOptionBuilder } from "../../../../Fixtures/builders/ProductOptionBuilder";
 import { ProductOptionChoiceBuilder } from "../../../../Fixtures/builders/ProductOptionChoiceBuilder";
@@ -63,10 +60,13 @@ describe("ChoiceSelectionService", () => {
 
   describe("selectChoices", () => {
     it("should select valid choices", () => {
-      const optionIds = [OptionIds.FRAME_TYPE)];
-      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME)];
+      const optionIds = [OptionIds.FRAME_TYPE];
+      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME];
 
-      const result = service.selectChoices(product, optionIds, choiceIds);
+      const result = service.selectChoices(
+        product,
+        new SelectedOptions(optionIds, choiceIds)
+      );
 
       expect(result.isSuccess()).toBe(true);
       const selectedChoice = product.optionChoices.findById(
@@ -76,13 +76,16 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should reject multiple choices for same option", () => {
-      const optionIds = [OptionIds.FRAME_TYPE)];
+      const optionIds = [OptionIds.FRAME_TYPE];
       const choiceIds = [
-        ChoiceIds.FULL_SUSPENSION_FRAME),
-        ChoiceIds.DIAMOND_FRAME),
+        ChoiceIds.FULL_SUSPENSION_FRAME,
+        ChoiceIds.DIAMOND_FRAME,
       ];
 
-      const result = service.selectChoices(product, optionIds, choiceIds);
+      const result = service.selectChoices(
+        product,
+        new SelectedOptions(optionIds, choiceIds)
+      );
 
       expect(result.isError()).toBe(true);
       expect(result.getError().message).toBe(
@@ -97,10 +100,13 @@ describe("ChoiceSelectionService", () => {
       );
       choiceToDisable!.disabled = true;
 
-      const optionIds = [OptionIds.FRAME_TYPE)];
-      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME)];
+      const optionIds = [OptionIds.FRAME_TYPE];
+      const choiceIds = [ChoiceIds.FULL_SUSPENSION_FRAME];
 
-      const result = service.selectChoices(product, optionIds, choiceIds);
+      const result = service.selectChoices(
+        product,
+        new SelectedOptions(optionIds, choiceIds)
+      );
 
       expect(result.isError()).toBe(true);
       expect(result.getError().message).toBe(
@@ -109,10 +115,13 @@ describe("ChoiceSelectionService", () => {
     });
 
     it("should handle options with no matching choices", () => {
-      const optionIds = [OptionIds.FRAME_TYPE)];
-      const choiceIds = [999)]; // Non-existent choice
+      const optionIds = [OptionIds.FRAME_TYPE];
+      const choiceIds = [999]; // Non-existent choice
 
-      const result = service.selectChoices(product, optionIds, choiceIds);
+      const result = service.selectChoices(
+        product,
+        new SelectedOptions(optionIds, choiceIds)
+      );
 
       expect(result.isSuccess()).toBe(true);
     });
