@@ -2,8 +2,8 @@ import {
   ProductCreatedEvent,
   ProductPriceChangedEvent,
   ProductStockUpdatedEvent,
-} from "../../Inventory/Events/ProductEvents";
-import { BaseEventHandler, EventHandlerResult } from "../../Shared/EventBus";
+} from "../../../Inventory/Events/ProductEvents";
+import { BaseEventHandler, EventHandlerResult } from "../../../Shared/EventBus";
 
 export class CatalogProductCreatedHandler extends BaseEventHandler<ProductCreatedEvent> {
   constructor() {
