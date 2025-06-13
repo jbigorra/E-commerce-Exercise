@@ -7,7 +7,7 @@ export class ChoiceSelectionService {
     product: Product,
     selectedOptions: SelectedOptions
   ): Result<void> {
-    for (const optionId of selectedOptions.optionIds) {
+    for (const optionId of selectedOptions.partIds) {
       const choicesToSelect =
         product.optionChoices.findMatchingChoicesForOption(
           optionId,

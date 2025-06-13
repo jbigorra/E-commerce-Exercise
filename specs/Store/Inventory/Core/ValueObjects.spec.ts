@@ -2,40 +2,49 @@ import { SelectedOptions } from "../../../../src/Store/Inventory/Core/ValueObjec
 
 describe("ValueObjects", () => {
   describe("SelectedOptions", () => {
-    it("should create SelectedOptions with empty arrays", () => {
-      const selectedOptions = new SelectedOptions([], []);
+    describe("Constructor validation", () => {
+      it("should throw error when no parts are provided", () => {
+        expect(() => {
+          new SelectedOptions([], [101, 102]);
+        }).toThrow(
+          "At least one product part must be selected to customize the product"
+        );
+      });
 
-      expect(selectedOptions.optionIds).toHaveLength(0);
-      expect(selectedOptions.choiceIds).toHaveLength(0);
-      expect(selectedOptions.hasOptions()).toBe(false);
-      expect(selectedOptions.hasChoices()).toBe(false);
-    });
+      it("should throw error when no part choices are provided", () => {
+        expect(() => {
+          new SelectedOptions([1, 2], []);
+        }).toThrow(
+          "At least one product part choice must be selected to customize the product"
+        );
+      });
 
-    it("should create SelectedOptions with options and choices", () => {
-      const optionIds = [1, 2];
-      const choiceIds = [101, 102];
-      const selectedOptions = new SelectedOptions(optionIds, choiceIds);
+      it("should throw error when both parts and part choices are empty", () => {
+        expect(() => {
+          new SelectedOptions([], []);
+        }).toThrow(
+          "At least one product part must be selected to customize the product"
+        );
+      });
 
-      expect(selectedOptions.optionIds).toHaveLength(2);
-      expect(selectedOptions.choiceIds).toHaveLength(2);
-      expect(selectedOptions.hasOptions()).toBe(true);
-      expect(selectedOptions.hasChoices()).toBe(true);
-    });
+      it("should throw error when duplicate part choices are provided", () => {
+        expect(() => {
+          new SelectedOptions([1, 2], [101, 101, 102]);
+        }).toThrow("Only one part choice can be selected per part");
+      });
 
-    it("should detect options only", () => {
-      const optionIds = [1];
-      const selectedOptions = new SelectedOptions(optionIds, []);
+      it("should create valid SelectedOptions with unique parts and part choices", () => {
+        const partIds = [1, 2, 3];
+        const partChoiceIds = [101, 102, 103];
 
-      expect(selectedOptions.hasOptions()).toBe(true);
-      expect(selectedOptions.hasChoices()).toBe(false);
-    });
+        expect(() => {
+          new SelectedOptions(partIds, partChoiceIds);
+        }).not.toThrow();
 
-    it("should detect choices only", () => {
-      const choiceIds = [101];
-      const selectedOptions = new SelectedOptions([], choiceIds);
-
-      expect(selectedOptions.hasOptions()).toBe(false);
-      expect(selectedOptions.hasChoices()).toBe(true);
+        const selectedOptions = new SelectedOptions(partIds, partChoiceIds);
+        expect(selectedOptions.partIds).toEqual(partIds);
+        expect(selectedOptions.partChoiceIds).toEqual(partChoiceIds);
+      });
     });
   });
 });
